@@ -4,6 +4,7 @@ import {
 	getAuthMessageAuthMessagePost,
 	loginWithWalletAuthLoginPost,
 	registerUserAuthRegisterPost,
+	isRegisteredAuthIsRegisteredGet,
 } from "@/apis/backend/sdk.gen";
 import { toast } from "sonner";
 
@@ -100,14 +101,12 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			return;
 		}
 
-		// Check if user is registered
+		// Check if user is registered - this will also set the username if it exists
 		const isRegistered = await state.checkRegistration();
 		set({
 			isAuthenticating: false,
 			account: newAccount,
 			isRegistered,
-			// If registered, mock a username
-			username: isRegistered ? `user_${newAccount.address.substring(2, 8)}` : null,
 		});
 	},
 
@@ -157,10 +156,31 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	},
 
 	checkRegistration: async (): Promise<boolean> => {
-		// Mock function to check if user is registered
-		// In a real app, this would call a backend API
-		const mockRegistered = Math.random() > 0.5; // 50% chance of being registered
-		return mockRegistered;
+		const { jwtToken } = get();
+		
+		if (!jwtToken) {
+			return false;
+		}
+		
+		try {
+			const response = await isRegisteredAuthIsRegisteredGet();
+			
+			if (response.data && typeof response.data === 'object') {
+				const { registered, username } = response.data;
+				
+				// If user is registered and has a username, update the username in the store
+				if (registered && username) {
+					set({ username });
+				}
+				
+				return registered;
+			}
+			
+			return false;
+		} catch (error) {
+			console.error("Error checking registration status:", error);
+			return false;
+		}
 	},
 
 	registerUser: async (username: string): Promise<boolean> => {

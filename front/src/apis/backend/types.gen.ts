@@ -4,6 +4,11 @@ export type AuthCheckUsernameResponse = {
     available: boolean;
 };
 
+export type AuthIsRegisteredResponse = {
+    registered: boolean;
+    username?: string | null;
+};
+
 export type AuthLoginRequest = {
     address: string;
     signature: string;
@@ -115,7 +120,7 @@ export type RegisterUserAuthRegisterPostResponses = {
 
 export type RegisterUserAuthRegisterPostResponse = RegisterUserAuthRegisterPostResponses[keyof RegisterUserAuthRegisterPostResponses];
 
-export type CheckUsernameAuthAvailableEnsUsernamePostData = {
+export type CheckUsernameAuthAvailableEnsUsernameGetData = {
     body?: never;
     path: {
         username: string;
@@ -124,23 +129,48 @@ export type CheckUsernameAuthAvailableEnsUsernamePostData = {
     url: '/auth/available-ens/{username}';
 };
 
-export type CheckUsernameAuthAvailableEnsUsernamePostErrors = {
+export type CheckUsernameAuthAvailableEnsUsernameGetErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type CheckUsernameAuthAvailableEnsUsernamePostError = CheckUsernameAuthAvailableEnsUsernamePostErrors[keyof CheckUsernameAuthAvailableEnsUsernamePostErrors];
+export type CheckUsernameAuthAvailableEnsUsernameGetError = CheckUsernameAuthAvailableEnsUsernameGetErrors[keyof CheckUsernameAuthAvailableEnsUsernameGetErrors];
 
-export type CheckUsernameAuthAvailableEnsUsernamePostResponses = {
+export type CheckUsernameAuthAvailableEnsUsernameGetResponses = {
     /**
      * Successful Response
      */
     200: AuthCheckUsernameResponse;
 };
 
-export type CheckUsernameAuthAvailableEnsUsernamePostResponse = CheckUsernameAuthAvailableEnsUsernamePostResponses[keyof CheckUsernameAuthAvailableEnsUsernamePostResponses];
+export type CheckUsernameAuthAvailableEnsUsernameGetResponse = CheckUsernameAuthAvailableEnsUsernameGetResponses[keyof CheckUsernameAuthAvailableEnsUsernameGetResponses];
+
+export type IsRegisteredAuthIsRegisteredGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/is-registered';
+};
+
+export type IsRegisteredAuthIsRegisteredGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type IsRegisteredAuthIsRegisteredGetError = IsRegisteredAuthIsRegisteredGetErrors[keyof IsRegisteredAuthIsRegisteredGetErrors];
+
+export type IsRegisteredAuthIsRegisteredGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AuthIsRegisteredResponse;
+};
+
+export type IsRegisteredAuthIsRegisteredGetResponse = IsRegisteredAuthIsRegisteredGetResponses[keyof IsRegisteredAuthIsRegisteredGetResponses];
 
 export type ClientOptions = {
     baseURL: 'http://localhost:8000' | (string & {});

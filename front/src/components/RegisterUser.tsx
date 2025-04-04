@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { AlertCircleIcon, BadgeCheckIcon, CheckCircle2Icon, CheckIcon, UserIcon, XIcon } from "lucide-react";
-import { checkUsernameAuthAvailableEnsUsernamePost } from "@/apis/backend/sdk.gen";
+import { checkUsernameAuthAvailableEnsUsernameGet } from "@/apis/backend/sdk.gen";
 import { useDebounce } from "@/lib/utils";
 import { z } from "zod";
 import { thirdwebClient } from "@/config/thirdweb.ts";
@@ -66,15 +66,10 @@ export const RegisterUser = () => {
 			setIsChecking(true);
 
 			try {
-				const response = await checkUsernameAuthAvailableEnsUsernamePost({
+				const response = await checkUsernameAuthAvailableEnsUsernameGet({
 					path: {
 						username: debouncedUsername,
 					},
-					headers: jwtToken
-						? {
-								Authorization: `Bearer ${jwtToken}`,
-							}
-						: undefined,
 				});
 
 				setIsAvailable(response.data?.available ?? false);

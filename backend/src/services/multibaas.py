@@ -40,7 +40,6 @@ class MultibaasService:
                 ) as response:
                     response.raise_for_status()
                     result = await response.json()
-                    print(result)
                     return result.get("result", {}).get("output", False)
         except Exception as e:
             logger.error(f"Error checking ENS subname availability: {e}")

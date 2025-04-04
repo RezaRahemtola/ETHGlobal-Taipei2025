@@ -29,3 +29,8 @@ class AuthRegisterResponse(BaseModel):
 
 class AuthCheckUsernameResponse(BaseModel):
     available: bool
+
+
+class AuthIsRegisteredResponse(BaseModel):
+    registered: bool
+    username: str | None = None

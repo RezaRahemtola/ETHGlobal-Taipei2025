@@ -10,6 +10,7 @@ from src.interfaces.auth import (
     AuthRegisterRequest,
     AuthRegisterResponse,
     AuthCheckUsernameResponse,
+    AuthIsRegisteredResponse,
 )
 from src.services.auth import create_access_token, get_current_address
 from src.services.multibaas import multibaas_service
@@ -109,9 +110,14 @@ async def check_username(username: str) -> AuthCheckUsernameResponse:
     "/is-registered",
     description="Check if a user is registered both on ENS and in the database",
 )
-async def is_registered(user_address=Depends(get_current_address)) -> bool:
+async def is_registered(
+    user_address=Depends(get_current_address),
+) -> AuthIsRegisteredResponse:
     # Check if user exists in the database
-    db_registered = await user_service.user_exists(user_address)
+    db_registered = await user_service.get_user_by_address(user_address)
 
     # User is considered registered if they exist in both ENS and the database
-    return db_registered
+    return AuthIsRegisteredResponse(
+        registered=db_registered is not None,
+        username=db_registered.username if db_registered else None,
+    )
