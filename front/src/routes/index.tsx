@@ -45,7 +45,7 @@ function Index() {
 			clearTimeout(timer);
 			window.removeEventListener("scroll", handleScroll);
 		};
-	}, []);
+	}, [isMobile]);
 
 	return (
 		<div className="relative min-h-screen w-full overflow-x-hidden">

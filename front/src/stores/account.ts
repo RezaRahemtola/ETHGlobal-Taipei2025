@@ -157,25 +157,25 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 
 	checkRegistration: async (): Promise<boolean> => {
 		const { jwtToken } = get();
-		
+
 		if (!jwtToken) {
 			return false;
 		}
-		
+
 		try {
 			const response = await isRegisteredAuthIsRegisteredGet();
-			
-			if (response.data && typeof response.data === 'object') {
+
+			if (response.data && typeof response.data === "object") {
 				const { registered, username } = response.data;
-				
+
 				// If user is registered and has a username, update the username in the store
 				if (registered && username) {
 					set({ username });
 				}
-				
+
 				return registered;
 			}
-			
+
 			return false;
 		} catch (error) {
 			console.error("Error checking registration status:", error);
