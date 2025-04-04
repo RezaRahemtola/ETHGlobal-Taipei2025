@@ -13,6 +13,7 @@ from src.interfaces.auth import (
 )
 from src.services.auth import create_access_token, get_current_address
 from src.services.multibaas import multibaas_service
+from src.services.user import user_service
 from src.utils.ethereum import format_eth_address, is_eth_signature_valid
 from src.utils.logger import setup_logger
 
@@ -65,13 +66,36 @@ async def login_with_wallet(
     return AuthLoginResponse(access_token=access_token, address=request.address)
 
 
-@router.post("/register", description="Adds an ENS subname to a user")
+@router.post(
+    "/register",
+    description="Adds an ENS subname to a user and creates the user in the database",
+)
 async def register_user(
     request: AuthRegisterRequest, user_address=Depends(get_current_address)
 ) -> AuthRegisterResponse:
+    # First check if ENS subname is available
+    is_available = await multibaas_service.is_ens_subname_available(request.username)
+    if not is_available:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username is not available",
+        )
+
+    # Register the ENS subname
     success = await multibaas_service.register_ens_subname(
         request.username, user_address
     )
+
+    # If ENS registration was successful, create the user in the database
+    if success:
+        db_success = await user_service.create_user(
+            address=user_address, username=request.username
+        )
+        if not db_success:
+            logger.error(f"Failed to create user in database for {user_address}")
+            # We don't want to fail the request if the database insert fails
+            # since the ENS registration was successful
+
     return AuthRegisterResponse(success=success)
 
 
@@ -81,7 +105,13 @@ async def check_username(username: str) -> AuthCheckUsernameResponse:
     return AuthCheckUsernameResponse(available=is_available)
 
 
-@router.get("/is-registered", description="Check if a user is registered")
+@router.get(
+    "/is-registered",
+    description="Check if a user is registered both on ENS and in the database",
+)
 async def is_registered(user_address=Depends(get_current_address)) -> bool:
-    result = await multibaas_service.is_user_registered(user_address)
-    return result
+    # Check if user exists in the database
+    db_registered = await user_service.user_exists(user_address)
+
+    # User is considered registered if they exist in both ENS and the database
+    return db_registered

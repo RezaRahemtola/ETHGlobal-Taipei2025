@@ -16,6 +16,8 @@ class _Config:
     LOG_LEVEL: int
     LOG_FILE: str | None
 
+    DATABASE_URL: str
+
     JWT_SECRET: str
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int
     IS_DEVELOPMENT: bool
@@ -42,6 +44,8 @@ class _Config:
         log_level_str = os.getenv("LOG_LEVEL", "INFO").upper()
         self.LOG_LEVEL = getattr(logging, log_level_str, logging.INFO)
         self.LOG_FILE = os.getenv("LOG_FILE", None)
+
+        self.DATABASE_URL = os.path.expandvars(os.getenv("DATABASE_URL", ""))
 
         self.JWT_SECRET = os.getenv("JWT_SECRET")
         self.JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(
