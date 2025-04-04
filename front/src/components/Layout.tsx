@@ -1,17 +1,18 @@
-import { Link, Outlet, useRouter } from "@tanstack/react-router";
+import { Link, Outlet } from "@tanstack/react-router";
 import { useAccountStore } from "@/stores/account";
 import { HistoryIcon, HomeIcon, LogOutIcon, SendIcon } from "lucide-react";
 import { useActiveWallet, useDisconnect } from "thirdweb/react";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useQueryState } from "nuqs";
 
 export function Layout() {
 	const { account, onDisconnect: onDisconnectStore } = useAccountStore();
 	const { disconnect } = useDisconnect();
 	const wallet = useActiveWallet();
-	const router = useRouter();
 	const isMobile = useIsMobile();
 	const [scrolled, setScrolled] = useState(false);
+	const [activeView, setActiveView] = useQueryState("view", { defaultValue: "home" });
 
 	useEffect(() => {
 		// Check scroll position for header styling
@@ -22,7 +23,7 @@ export function Layout() {
 		// Initial check
 		handleScroll();
 
-		// Add event listener
+		// Add event listeners
 		window.addEventListener("scroll", handleScroll);
 
 		// Add mobile class to body for performance optimizations
@@ -32,6 +33,11 @@ export function Layout() {
 			window.removeEventListener("scroll", handleScroll);
 		};
 	}, [isMobile]);
+
+	// Handle bottom nav item click
+	const handleNavClick = (view: string) => {
+		setActiveView(view);
+	};
 
 	const onDisconnect = async () => {
 		if (wallet) {
@@ -93,11 +99,21 @@ export function Layout() {
 					<MobileNavItem
 						icon={<HomeIcon className="h-5 w-5" />}
 						label="Home"
-						to="/"
-						isActive={router.state.location.pathname === "/"}
+						onClick={() => handleNavClick("home")}
+						isActive={activeView === "home"}
 					/>
-					<MobileNavItem icon={<SendIcon className="h-5 w-5" />} label="Send" to="/" isActive={false} />
-					<MobileNavItem icon={<HistoryIcon className="h-5 w-5" />} label="History" to="/" isActive={false} />
+					<MobileNavItem
+						icon={<SendIcon className="h-5 w-5" />}
+						label="Send"
+						onClick={() => handleNavClick("send")}
+						isActive={activeView === "send"}
+					/>
+					<MobileNavItem
+						icon={<HistoryIcon className="h-5 w-5" />}
+						label="History"
+						onClick={() => handleNavClick("history")}
+						isActive={activeView === "history"}
+					/>
 					<button
 						onClick={onDisconnect}
 						className="flex flex-col items-center justify-center w-full max-w-[4.5rem] py-1 px-1 touch-manipulation"
@@ -117,24 +133,23 @@ export function Layout() {
 function MobileNavItem({
 	icon,
 	label,
-	to,
+	onClick,
 	isActive,
 }: {
 	icon: React.ReactNode;
 	label: string;
-	to: string;
+	onClick: () => void;
 	isActive: boolean;
 }) {
 	return (
-		<Link
-			to={to}
+		<button
+			onClick={onClick}
 			className="flex flex-col items-center justify-center w-full max-w-[4.5rem] py-1 px-1 touch-manipulation"
-			activeProps={{ className: "text-indigo-600" }}
 		>
 			<div className={`${isActive ? "bg-indigo-50 text-indigo-600" : "text-slate-600"} p-1.5 rounded-full`}>{icon}</div>
 			<span className={`text-[10px] mt-0.5 ${isActive ? "text-indigo-600 font-medium" : "text-slate-600"}`}>
 				{label}
 			</span>
-		</Link>
+		</button>
 	);
 }
