@@ -17,8 +17,8 @@ export default defineConfig({
 				enabled: true,
 			},
 			manifest: {
-				name: "My PWA App",
-				short_name: "PWA App",
+				name: "Solva",
+				short_name: "Solva",
 				description: "A React PWA built with Vite",
 				theme_color: "#ffffff",
 				background_color: "#ffffff",

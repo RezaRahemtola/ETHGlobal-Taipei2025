@@ -11,7 +11,7 @@ from src.interfaces.auth import (
     AuthRegisterResponse,
     AuthCheckUsernameResponse,
 )
-from src.services.auth import create_access_token, verify_token, get_current_address
+from src.services.auth import create_access_token, get_current_address
 from src.services.multibaas import multibaas_service
 from src.utils.ethereum import format_eth_address, is_eth_signature_valid
 from src.utils.logger import setup_logger
@@ -65,17 +65,23 @@ async def login_with_wallet(
     return AuthLoginResponse(access_token=access_token, address=request.address)
 
 
-@router.post("/register", dependencies=[Depends(verify_token)])
+@router.post("/register", description="Adds an ENS subname to a user")
 async def register_user(
     request: AuthRegisterRequest, user_address=Depends(get_current_address)
 ) -> AuthRegisterResponse:
-    result = await multibaas_service.register_ens_subname(
+    success = await multibaas_service.register_ens_subname(
         request.username, user_address
     )
-    return AuthRegisterResponse(success=result)
+    return AuthRegisterResponse(success=success)
 
 
-@router.post("/available-ens/{username}")
+@router.get("/available-ens/{username}")
 async def check_username(username: str) -> AuthCheckUsernameResponse:
     is_available = await multibaas_service.is_ens_subname_available(username)
     return AuthCheckUsernameResponse(available=is_available)
+
+
+@router.get("/is-registered", description="Check if a user is registered")
+async def is_registered(user_address=Depends(get_current_address)) -> bool:
+    result = await multibaas_service.is_user_registered(user_address)
+    return result

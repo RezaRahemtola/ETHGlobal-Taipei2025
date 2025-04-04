@@ -16,7 +16,7 @@ app.openapi_components = {  # type: ignore
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://TODO-prod.com"]
+    allow_origins=["https://solva.rezar.fr"]
     + (["http://localhost:5173"] if config.IS_DEVELOPMENT else []),
     allow_methods=["*"],
     allow_headers=["*"],

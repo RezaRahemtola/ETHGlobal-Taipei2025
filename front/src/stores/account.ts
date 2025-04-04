@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import { Account } from "thirdweb/wallets";
-import { getAuthMessageAuthMessagePost, loginWithWalletAuthLoginPost, registerUserAuthRegisterPost } from "@/apis/backend/sdk.gen";
+import {
+	getAuthMessageAuthMessagePost,
+	loginWithWalletAuthLoginPost,
+	registerUserAuthRegisterPost,
+} from "@/apis/backend/sdk.gen";
 import { toast } from "sonner";
 
 type AccountStoreState = {
@@ -25,38 +29,38 @@ export type Transaction = {
 	recipient: string;
 	recipientAddress: string;
 	date: Date;
-	status: 'completed' | 'pending' | 'failed';
-	type: 'sent' | 'received';
+	status: "completed" | "pending" | "failed";
+	type: "sent" | "received";
 };
 
 // Mock transactions
 const mockTransactions: Transaction[] = [
 	{
-		id: '1',
+		id: "1",
 		amount: 25,
-		recipient: 'Alice',
-		recipientAddress: '0x123...abc',
+		recipient: "Alice",
+		recipientAddress: "0x123...abc",
 		date: new Date(Date.now() - 86400000 * 2), // 2 days ago
-		status: 'completed',
-		type: 'sent',
+		status: "completed",
+		type: "sent",
 	},
 	{
-		id: '2',
+		id: "2",
 		amount: 50,
-		recipient: 'Bob',
-		recipientAddress: '0x456...def',
+		recipient: "Bob",
+		recipientAddress: "0x456...def",
 		date: new Date(Date.now() - 86400000), // 1 day ago
-		status: 'completed',
-		type: 'received',
+		status: "completed",
+		type: "received",
 	},
 	{
-		id: '3',
+		id: "3",
 		amount: 15,
-		recipient: 'Charlie',
-		recipientAddress: '0x789...ghi',
+		recipient: "Charlie",
+		recipientAddress: "0x789...ghi",
 		date: new Date(),
-		status: 'pending',
-		type: 'sent',
+		status: "pending",
+		type: "sent",
 	},
 ];
 
@@ -90,7 +94,7 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 		// Authenticate with the API
 		set({ isAuthenticating: true });
 		const authSuccess = await state.authenticate(newAccount);
-		
+
 		if (!authSuccess) {
 			set({ isAuthenticating: false, account: null });
 			return;
@@ -98,15 +102,15 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 
 		// Check if user is registered
 		const isRegistered = await state.checkRegistration();
-		set({ 
+		set({
 			isAuthenticating: false,
 			account: newAccount,
 			isRegistered,
 			// If registered, mock a username
-			username: isRegistered ? `user_${newAccount.address.substring(2, 8)}` : null
+			username: isRegistered ? `user_${newAccount.address.substring(2, 8)}` : null,
 		});
 	},
-	
+
 	authenticate: async (account: Account): Promise<boolean> => {
 		try {
 			// Get the message to sign
@@ -151,60 +155,60 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			return false;
 		}
 	},
-	
+
 	checkRegistration: async (): Promise<boolean> => {
 		// Mock function to check if user is registered
 		// In a real app, this would call a backend API
 		const mockRegistered = Math.random() > 0.5; // 50% chance of being registered
 		return mockRegistered;
 	},
-	
+
 	registerUser: async (username: string): Promise<boolean> => {
 		const { jwtToken } = get();
-		
+
 		if (!jwtToken) {
 			toast.error("Authentication required", {
 				description: "Please connect your wallet first",
 			});
 			return false;
 		}
-		
+
 		try {
 			// Call the register endpoint
 			const response = await registerUserAuthRegisterPost({
 				body: {
-					username
+					username,
 				},
 				headers: {
-					Authorization: `Bearer ${jwtToken}`
-				}
+					Authorization: `Bearer ${jwtToken}`,
+				},
 			});
-			
+
 			if (response.data?.success) {
 				// Successfully registered
-				set({ 
+				set({
 					isRegistered: true,
-					username 
+					username,
 				});
 				toast.success("Registration successful", {
-					description: `Welcome, ${username}!`
+					description: `Welcome, ${username}!`,
 				});
 				return true;
 			} else {
 				toast.error("Registration failed", {
-					description: "Could not register username"
+					description: "Could not register username",
 				});
 				return false;
 			}
 		} catch (error) {
 			console.error("Registration error:", error);
 			toast.error("Registration failed", {
-				description: error instanceof Error ? error.message : "Unknown error"
+				description: error instanceof Error ? error.message : "Unknown error",
 			});
 			return false;
 		}
 	},
-	
+
 	onDisconnect: () => {
 		set({
 			account: null,

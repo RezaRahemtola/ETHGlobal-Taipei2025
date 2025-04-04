@@ -50,18 +50,20 @@ export function Layout() {
 	return (
 		<div className="flex flex-col min-h-screen bg-slate-50">
 			{/* Header with scroll-based styling */}
-			<header
-				className={`sticky top-0 z-20 transition-all duration-300 ${
-					scrolled ? "bg-white/90 shadow-md backdrop-blur-sm border-b" : "bg-transparent"
-				}`}
-			>
-				<div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
-					<Link to="/" className="font-bold text-xl flex items-center gap-1">
-						<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Solva</span>
-					</Link>
+			{account && !isMobile && (
+				<header
+					className={`sticky top-0 z-20 transition-all duration-300 ${
+						scrolled ? "bg-white/90 shadow-md backdrop-blur-sm border-b" : "bg-transparent"
+					}`}
+				>
+					<div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
+						<Link to="/" className="font-bold text-xl flex items-center gap-1">
+							<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+								Solva
+							</span>
+						</Link>
 
-					{/* Only show disconnect button on desktop */}
-					{account && !isMobile && (
+						{/* Only show disconnect button on desktop */}
 						<nav className="flex items-center gap-4">
 							<button
 								onClick={onDisconnect}
@@ -71,9 +73,9 @@ export function Layout() {
 								<span className="font-medium">Disconnect</span>
 							</button>
 						</nav>
-					)}
-				</div>
-			</header>
+					</div>
+				</header>
+			)}
 
 			{/* Adjust padding when bottom nav is present */}
 			<main className={`flex-1 ${account && isMobile ? "pb-20" : "py-2 md:py-6"}`}>

@@ -10,6 +10,8 @@ class _Config:
     CURVEGRID_ENS_REGISTAR_CONTRACT_LABEL: str
     CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS: str
     CURVEGRID_HSM_ADDRESS: str
+    CURVEGRID_ENS_REGISTRY_CONTRACT_LABEL: str
+    CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS: str
 
     LOG_LEVEL: int
     LOG_FILE: str | None
@@ -29,6 +31,12 @@ class _Config:
             "CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS"
         )
         self.CURVEGRID_HSM_ADDRESS = os.getenv("CURVEGRID_HSM_ADDRESS")
+        self.CURVEGRID_ENS_REGISTRY_CONTRACT_LABEL = os.getenv(
+            "CURVEGRID_ENS_REGISTRY_CONTRACT_LABEL"
+        )
+        self.CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS = os.getenv(
+            "CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS"
+        )
 
         # Configure logging
         log_level_str = os.getenv("LOG_LEVEL", "INFO").upper()

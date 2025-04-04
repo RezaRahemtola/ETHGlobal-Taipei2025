@@ -80,5 +80,36 @@ class MultibaasService:
             logger.error(f"Error registering ENS subname: {e}")
             return False
 
+    async def is_user_registered(self, user_address: str) -> bool:
+        """
+        Check if a user is registered by verifying if their address is associated with an ENS subname.
+
+        Args:
+            user_address: The address to check.
+
+        Returns:
+            bool: True if the user is registered, False otherwise.
+        """
+        logger.debug(f"Checking if user {user_address} is registered")
+        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTRY_CONTRACT_LABEL}/methods/namehash"
+
+        args = {
+            "args": [user_address],
+            "signature": "namehash(string)",
+            "contractOverride": False,
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    api_url, headers=self.headers, json=args
+                ) as response:
+                    response.raise_for_status()
+                    result = await response.json()
+                    return result.get("result", {}).get("output", False)
+        except Exception as e:
+            logger.error(f"Error checking user registration: {e}")
+            return False
+
 
 multibaas_service = MultibaasService()

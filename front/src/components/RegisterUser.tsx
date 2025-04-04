@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useAccountStore } from "@/stores/account";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "./ui/card";
@@ -92,7 +92,7 @@ export const RegisterUser = () => {
 	}, [debouncedUsername, jwtToken, validation.success]);
 
 	// Handle username input change
-	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setUsername(e.target.value);
 	};
 
