@@ -3,6 +3,7 @@ import { PaymentApp } from "@/components/PaymentApp";
 import { useAccountStore } from "@/stores/account";
 import { About } from "@/components/About";
 import { useEffect, useState } from "react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 export const Route = createFileRoute("/")({
 	component: Index,
@@ -12,6 +13,7 @@ function Index() {
 	const { account } = useAccountStore();
 	const [loaded, setLoaded] = useState(false);
 	const [reducedMotion, setReducedMotion] = useState(false);
+	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		// Check for reduced motion preference
@@ -22,9 +24,6 @@ function Index() {
 		const timer = setTimeout(() => {
 			setLoaded(true);
 		}, 150);
-
-		// Detect if the device is mobile
-		const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 		// Apply special optimization for mobile devices
 		if (isMobile) {

@@ -4,74 +4,17 @@ import { RegisterUser } from "./RegisterUser";
 import { Dashboard } from "./Dashboard";
 import { Skeleton } from "./ui/skeleton";
 import { ArrowDownIcon, CoinsIcon, SparklesIcon, WalletIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 import { smoothScrollTo } from "@/lib/utils";
 
 export const PaymentApp = () => {
 	const { account, isRegistered, isAuthenticating } = useAccountStore();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		// Add mounting animation
-		setMounted(true);
-
-		// Add floating particle animation
-		const particleContainer = document.getElementById("particle-container");
-		if (particleContainer && !account) {
-			createParticles(particleContainer);
-		}
-
-		return () => {
-			// Cleanup particles on unmount
-			if (particleContainer) {
-				particleContainer.innerHTML = "";
-			}
-		};
-	}, [account]);
-
-	// Function to create floating particles
-	const createParticles = (container: HTMLElement) => {
-		// Optimize for mobile by reducing particle count
-		const particleCount = window.innerWidth < 768 ? 8 : 15;
-
-		for (let i = 0; i < particleCount; i++) {
-			const particle = document.createElement("div");
-
-			// Randomize particle styles
-			const size = Math.random() * 10 + 5;
-			const xPos = Math.random() * 100;
-			const delay = Math.random() * 5;
-			const duration = Math.random() * 20 + 10;
-			const opacity = Math.random() * 0.5 + 0.3;
-
-			// Different shapes and colors for particles
-			const colors = ["bg-indigo-400", "bg-violet-400", "bg-purple-400", "bg-blue-400", "bg-pink-400"];
-			const shapes = ["rounded-full", "rounded-sm", "rounded-md"];
-
-			const color = colors[Math.floor(Math.random() * colors.length)];
-			const shape = shapes[Math.floor(Math.random() * shapes.length)];
-
-			// Apply styles
-			particle.className = `absolute ${color} ${shape} opacity-${Math.floor(opacity * 10)}`;
-			particle.style.width = `${size}px`;
-			particle.style.height = `${size}px`;
-			particle.style.left = `${xPos}%`;
-			particle.style.bottom = "0";
-			particle.style.animation = `float-slow ${duration}s ease-in-out ${delay}s infinite`;
-
-			container.appendChild(particle);
-		}
-	};
 
 	// Not connected yet
 	if (!account) {
 		return (
 			<div
-				className={`min-h-[90vh] flex flex-col items-center justify-center p-4 text-center transition-all duration-1000 ease-out ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+				className={`min-h-[90vh] flex flex-col items-center justify-center p-4 text-center transition-all duration-1000 ease-out opacity-100 scale-100`}
 			>
-				{/* Particle container for floating animations */}
-				<div id="particle-container" className="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
-
 				<div className="mb-6 md:mb-8 relative z-10">
 					<div className="inline-flex items-center justify-center h-20 w-20 md:h-28 md:w-28 rounded-full bg-gradient-to-br from-indigo-600 to-violet-700 mb-4 md:mb-8 shadow-xl shadow-indigo-500/20 relative overflow-hidden">
 						<div className="absolute inset-0 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 animate-pulse-slow"></div>
@@ -147,9 +90,7 @@ export const PaymentApp = () => {
 	// Connected but not registered
 	if (!isRegistered) {
 		return (
-			<div
-				className={`transition-all duration-700 ease-out ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-			>
+			<div className={`transition-all duration-700 ease-out opacity-100 translate-y-0`}>
 				<RegisterUser />
 			</div>
 		);
@@ -157,9 +98,7 @@ export const PaymentApp = () => {
 
 	// Fully authenticated and registered
 	return (
-		<div
-			className={`transition-all duration-700 ease-out ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-		>
+		<div className={`transition-all duration-700 ease-out opacity-100 translate-y-0`}>
 			<Dashboard />
 		</div>
 	);

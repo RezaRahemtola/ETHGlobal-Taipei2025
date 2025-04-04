@@ -3,39 +3,32 @@ import { useAccountStore } from "@/stores/account";
 import { HistoryIcon, HomeIcon, LogOutIcon, SendIcon } from "lucide-react";
 import { useActiveWallet, useDisconnect } from "thirdweb/react";
 import { useEffect, useState } from "react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 export function Layout() {
 	const { account, onDisconnect: onDisconnectStore } = useAccountStore();
 	const { disconnect } = useDisconnect();
 	const wallet = useActiveWallet();
 	const router = useRouter();
-	const [isMobile, setIsMobile] = useState(false);
+	const isMobile = useIsMobile();
 	const [scrolled, setScrolled] = useState(false);
 
 	useEffect(() => {
-		// Check if device is mobile for responsive behaviors
-		const checkMobile = () => {
-			setIsMobile(window.innerWidth < 768);
-		};
-
 		// Check scroll position for header styling
 		const handleScroll = () => {
 			setScrolled(window.scrollY > 10);
 		};
 
-		// Initial checks
-		checkMobile();
+		// Initial check
 		handleScroll();
 
-		// Add event listeners
-		window.addEventListener("resize", checkMobile);
+		// Add event listener
 		window.addEventListener("scroll", handleScroll);
 
 		// Add mobile class to body for performance optimizations
 		document.body.classList.toggle("mobile-device", isMobile);
 
 		return () => {
-			window.removeEventListener("resize", checkMobile);
 			window.removeEventListener("scroll", handleScroll);
 		};
 	}, [isMobile]);
