@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 class _Config:
     CURVEGRID_API_KEY: str
     CURVEGRID_DEPLOYMENT_URL: str
+    CURVEGRID_ENS_REGISTAR_CONTRACT_LABEL: str
+    CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS: str
+    CURVEGRID_HSM_ADDRESS: str
 
     LOG_LEVEL: int
     LOG_FILE: str | None
@@ -19,6 +22,13 @@ class _Config:
         load_dotenv()
         self.CURVEGRID_API_KEY = os.getenv("CURVEGRID_API_KEY")
         self.CURVEGRID_DEPLOYMENT_URL = os.getenv("CURVEGRID_DEPLOYMENT_URL")
+        self.CURVEGRID_ENS_REGISTAR_CONTRACT_LABEL = os.getenv(
+            "CURVEGRID_ENS_REGISTAR_CONTRACT_LABEL"
+        )
+        self.CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS = os.getenv(
+            "CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS"
+        )
+        self.CURVEGRID_HSM_ADDRESS = os.getenv("CURVEGRID_HSM_ADDRESS")
 
         # Configure logging
         log_level_str = os.getenv("LOG_LEVEL", "INFO").upper()

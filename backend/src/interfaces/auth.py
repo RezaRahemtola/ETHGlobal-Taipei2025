@@ -17,3 +17,15 @@ class AuthLoginRequest(BaseModel):
 class AuthLoginResponse(BaseModel):
     access_token: str
     address: str
+
+
+class AuthRegisterRequest(BaseModel):
+    username: str
+
+
+class AuthRegisterResponse(BaseModel):
+    success: bool
+
+
+class AuthCheckUsernameResponse(BaseModel):
+    available: bool

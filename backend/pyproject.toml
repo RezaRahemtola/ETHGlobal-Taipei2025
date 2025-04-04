@@ -14,6 +14,7 @@ fastapi = { extras = ["standard"], version = "^0.114.1" }
 python-dotenv = "^1.0.1"
 pyjwt = "^2.8.0"
 web3 = "^7.10.0"
+aiohttp = "^3.11.16"
 
 
 [tool.poetry.group.dev.dependencies]

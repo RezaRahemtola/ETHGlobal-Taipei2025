@@ -1,5 +1,5 @@
 import fastapi
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 
 from src.config import config
 from src.interfaces.auth import (
@@ -7,8 +7,12 @@ from src.interfaces.auth import (
     AuthLoginResponse,
     AuthMessageRequest,
     AuthMessageResponse,
+    AuthRegisterRequest,
+    AuthRegisterResponse,
+    AuthCheckUsernameResponse,
 )
-from src.services.auth import create_access_token
+from src.services.auth import create_access_token, verify_token, get_current_address
+from src.services.multibaas import multibaas_service
 from src.utils.ethereum import format_eth_address, is_eth_signature_valid
 from src.utils.logger import setup_logger
 
@@ -59,3 +63,19 @@ async def login_with_wallet(
     logger.debug(f"Generated access token for address {request.address}")
 
     return AuthLoginResponse(access_token=access_token, address=request.address)
+
+
+@router.post("/register", dependencies=[Depends(verify_token)])
+async def register_user(
+    request: AuthRegisterRequest, user_address=Depends(get_current_address)
+) -> AuthRegisterResponse:
+    result = await multibaas_service.register_ens_subname(
+        request.username, user_address
+    )
+    return AuthRegisterResponse(success=result)
+
+
+@router.post("/available-ens/{username}")
+async def check_username(username: str) -> AuthCheckUsernameResponse:
+    is_available = await multibaas_service.is_ens_subname_available(username)
+    return AuthCheckUsernameResponse(available=is_available)
