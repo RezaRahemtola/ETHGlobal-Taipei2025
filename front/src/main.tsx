@@ -1,9 +1,11 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { client as backendClient } from "@/apis/backend/client.gen";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import env from "@/config/env.ts";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -27,6 +29,11 @@ if ("serviceWorker" in navigator) {
 			});
 	});
 }
+
+backendClient.setConfig({
+	baseURL: env.BACKEND_API_URL,
+	withCredentials: true, // Enable sending cookies in cross-origin requests
+});
 
 // Render the app
 const rootElement = document.getElementById("root")!;
