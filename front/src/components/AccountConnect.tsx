@@ -16,5 +16,5 @@ export const AccountConnect = () => {
 		onAccountChange(account).then();
 	});
 
-	return <ConnectEmbed client={thirdwebClient} />;
+	return <ConnectEmbed client={thirdwebClient} className="mx-auto" />;
 };
