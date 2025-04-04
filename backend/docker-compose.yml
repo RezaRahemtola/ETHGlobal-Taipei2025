@@ -1,0 +1,11 @@
+services:
+  solva-backend:
+    build:
+      dockerfile: ./Dockerfile
+    image: solva-backend
+    container_name: solva-backend
+    restart: always
+    ports:
+      - "8080:8000"
+    env_file:
+      - .env
