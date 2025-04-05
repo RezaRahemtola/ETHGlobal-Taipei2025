@@ -5,6 +5,7 @@ import {
 	changeAvatarUserAvatarPost,
 	getAuthMessageAuthMessagePost,
 	getAvatarUserAvatarGet,
+	getUserTransactionsUserTransactionsGet,
 	isRegisteredAuthIsRegisteredGet,
 	loginWithWalletAuthLoginPost,
 	registerUserAuthRegisterPost,
@@ -25,6 +26,7 @@ type AccountStoreState = {
 	balance: number;
 	isLoadingBalance: boolean;
 	transactions: Transaction[];
+	isLoadingTransactions: boolean;
 
 	onAccountChange: (newAccount: Account | undefined) => Promise<void>;
 	onDisconnect: () => void;
@@ -34,57 +36,17 @@ type AccountStoreState = {
 	fetchAvatar: () => Promise<void>;
 	uploadAvatar: (file: File) => Promise<boolean>;
 	fetchUSDCBalance: () => Promise<void>;
+	fetchTransactions: () => Promise<void>;
 };
 
 export type Transaction = {
 	id: string;
 	amount: number;
 	recipient: string;
-	recipientAddress: string;
 	date: Date;
 	status: "completed" | "pending" | "failed";
 	type: "sent" | "received" | "topup";
 };
-
-// Mock transactions
-const mockTransactions: Transaction[] = [
-	{
-		id: "1",
-		amount: 25,
-		recipient: "Alice",
-		recipientAddress: "0x123...abc",
-		date: new Date(Date.now() - 86400000 * 2), // 2 days ago
-		status: "completed",
-		type: "sent",
-	},
-	{
-		id: "2",
-		amount: 50,
-		recipient: "Bob",
-		recipientAddress: "0x456...def",
-		date: new Date(Date.now() - 86400000), // 1 day ago
-		status: "completed",
-		type: "received",
-	},
-	{
-		id: "3",
-		amount: 15,
-		recipient: "Charlie",
-		recipientAddress: "0x789...ghi",
-		date: new Date(),
-		status: "pending",
-		type: "sent",
-	},
-	{
-		id: "4",
-		amount: 100,
-		recipient: "Wallet",
-		recipientAddress: "self",
-		date: new Date(Date.now() - 86400000 * 0.5), // 12 hours ago
-		status: "completed",
-		type: "topup",
-	},
-];
 
 export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	account: null,
@@ -95,7 +57,8 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	avatarUrl: null,
 	balance: 0,
 	isLoadingBalance: false,
-	transactions: [...mockTransactions],
+	transactions: [],
+	isLoadingTransactions: false,
 
 	onAccountChange: async (newAccount: Account | undefined) => {
 		const state = get();
@@ -134,6 +97,11 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 
 		// Fetch the USDC balance
 		state.fetchUSDCBalance();
+		
+		// Fetch transactions if the user is registered
+		if (isRegistered) {
+			state.fetchTransactions();
+		}
 	},
 
 	authenticate: async (account: Account): Promise<boolean> => {
@@ -364,6 +332,47 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			console.error("Error fetching USDC balance:", error);
 			set({ isLoadingBalance: false });
 			toast.error("Failed to fetch balance", {
+				description: error instanceof Error ? error.message : "Unknown error",
+			});
+		}
+	},
+
+	fetchTransactions: async () => {
+		const { jwtToken, username } = get();
+
+		if (!jwtToken) {
+			return;
+		}
+
+		try {
+			set({ isLoadingTransactions: true });
+
+			const response = await getUserTransactionsUserTransactionsGet();
+
+			if (response.data?.transactions) {
+				// Map backend transactions to our app's transaction format
+				const mappedTransactions: Transaction[] = response.data.transactions.map((tx) => {
+					const isSender = username === tx.sender_username;
+
+					return {
+						id: tx.transaction_hash,
+						amount: tx.amount,
+						recipient: isSender ? tx.receiver_username : tx.sender_username,
+						date: new Date(tx.created_at),
+						status: "completed", // Backend doesn't provide status yet
+						type: tx.type === "topup" ? "topup" : isSender ? "sent" : "received",
+					};
+				});
+
+				set({
+					transactions: mappedTransactions,
+					isLoadingTransactions: false,
+				});
+			}
+		} catch (error) {
+			console.error("Error fetching transactions:", error);
+			set({ isLoadingTransactions: false });
+			toast.error("Failed to fetch transactions", {
 				description: error instanceof Error ? error.message : "Unknown error",
 			});
 		}

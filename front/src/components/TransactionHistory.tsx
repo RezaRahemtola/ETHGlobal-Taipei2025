@@ -25,7 +25,7 @@ export const TransactionHistory = () => {
 							<ClockIcon className="h-8 w-8 text-slate-400" />
 						</div>
 						<p className="font-medium text-slate-600">No transactions yet</p>
-						<p className="text-sm text-slate-400 mt-1">Send some money to get started</p>
+						<p className="text-sm text-slate-400 mt-1">Deposit some money to get started</p>
 					</div>
 				</div>
 			</div>
@@ -46,7 +46,7 @@ export const TransactionHistory = () => {
 							<ClockIcon className="h-8 w-8 text-slate-400" />
 						</div>
 						<p className="font-medium text-slate-600">No transactions yet</p>
-						<p className="text-sm text-slate-400 mt-1">Send some money to get started</p>
+						<p className="text-sm text-slate-400 mt-1">Deposit some money to get started</p>
 					</div>
 				</CardContent>
 			</Card>

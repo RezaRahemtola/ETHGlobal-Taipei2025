@@ -45,12 +45,6 @@ export const SendMoney = () => {
 				id: Date.now().toString(),
 				amount: numAmount,
 				recipient,
-				recipientAddress:
-					"0x" +
-					Array(40)
-						.fill(0)
-						.map(() => Math.floor(Math.random() * 16).toString(16))
-						.join(""),
 				date: new Date(),
 				status: "pending",
 				type: "sent",

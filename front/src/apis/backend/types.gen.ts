@@ -39,8 +39,27 @@ export type BodyChangeAvatarUserAvatarPost = {
     file: Blob | File;
 };
 
+export type GetTransactionsResponse = {
+    transactions: Array<Transaction>;
+};
+
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
+};
+
+export type ThirdwebWebhookPayload = {
+    data: {
+        [key: string]: unknown;
+    };
+};
+
+export type Transaction = {
+    receiver_username: string;
+    sender_username: string;
+    amount: number;
+    type: 'topup' | 'p2p';
+    transaction_hash: string;
+    created_at: string;
 };
 
 export type ValidationError = {
@@ -225,6 +244,58 @@ export type ChangeAvatarUserAvatarPostResponses = {
 };
 
 export type ChangeAvatarUserAvatarPostResponse = ChangeAvatarUserAvatarPostResponses[keyof ChangeAvatarUserAvatarPostResponses];
+
+export type GetUserTransactionsUserTransactionsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/user/transactions';
+};
+
+export type GetUserTransactionsUserTransactionsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetUserTransactionsUserTransactionsGetError = GetUserTransactionsUserTransactionsGetErrors[keyof GetUserTransactionsUserTransactionsGetErrors];
+
+export type GetUserTransactionsUserTransactionsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: GetTransactionsResponse;
+};
+
+export type GetUserTransactionsUserTransactionsGetResponse = GetUserTransactionsUserTransactionsGetResponses[keyof GetUserTransactionsUserTransactionsGetResponses];
+
+export type ThirdwebWebhookThirdwebWebhookPostData = {
+    body: ThirdwebWebhookPayload;
+    headers?: {
+        'X-Pay-Signature'?: string;
+        'X-Pay-Timestamp'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/thirdweb/webhook';
+};
+
+export type ThirdwebWebhookThirdwebWebhookPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ThirdwebWebhookThirdwebWebhookPostError = ThirdwebWebhookThirdwebWebhookPostErrors[keyof ThirdwebWebhookThirdwebWebhookPostErrors];
+
+export type ThirdwebWebhookThirdwebWebhookPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type ClientOptions = {
     baseURL: 'http://localhost:8000' | (string & {});
