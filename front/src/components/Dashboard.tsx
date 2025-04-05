@@ -31,7 +31,7 @@ export const Dashboard = () => {
 
 	const url = useMemo(
 		() =>
-			`${window.location.protocol}//${window.location.hostname}${window.location.port ?? ""}?view=send&recipient=${username}`,
+			`${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ""}?view=send&recipient=${username}`,
 		[username],
 	);
 

@@ -9,8 +9,31 @@ import { smoothScrollTo } from "@/lib/utils";
 export const PaymentApp = () => {
 	const { account, isRegistered, isAuthenticating } = useAccountStore();
 
-	// Not connected yet
+	// Auto-connecting or not connected yet
 	if (!account) {
+		// If we're trying to authenticate, show loading spinner (full screen)
+		if (isAuthenticating) {
+			return (
+				<div className="min-h-screen w-full flex items-center justify-center">
+					<div className="w-full max-w-md mx-auto p-4 space-y-6">
+						<div className="text-center mb-4">
+							<div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 mb-6 relative">
+								<div className="absolute inset-4 rounded-full border-4 border-indigo-300 border-t-transparent animate-spin"></div>
+								<div className="absolute inset-2 rounded-full border-4 border-violet-400 border-b-transparent animate-spin animate-reverse"></div>
+								<div className="h-10 w-10 rounded-full border-4 border-t-transparent border-indigo-600 animate-spin"></div>
+							</div>
+
+							<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-700">
+								Connecting Wallet...
+							</h1>
+							<p className="text-slate-500">Please wait while we restore your session</p>
+						</div>
+					</div>
+				</div>
+			);
+		}
+		
+		// Normal connection flow when not authenticating
 		return (
 			<div
 				className={`min-h-[90vh] flex flex-col items-center justify-center p-4 text-center transition-all duration-1000 ease-out opacity-100 scale-100`}
@@ -56,36 +79,7 @@ export const PaymentApp = () => {
 		);
 	}
 
-	// Authenticating
-	if (isAuthenticating) {
-		return (
-			<div className="w-full max-w-md mx-auto p-4 space-y-6">
-				<div className="text-center mb-4">
-					<div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 mb-6 relative">
-						{/* Multiple spinner layers for effect */}
-						<div className="absolute inset-4 rounded-full border-4 border-indigo-300 border-t-transparent animate-spin"></div>
-						<div className="absolute inset-2 rounded-full border-4 border-violet-400 border-b-transparent animate-spin animate-reverse"></div>
-						<div className="h-10 w-10 rounded-full border-4 border-t-transparent border-indigo-600 animate-spin"></div>
-					</div>
-
-					<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-700">
-						Connecting...
-					</h1>
-					<p className="text-slate-500">Please wait while we authenticate your account</p>
-				</div>
-
-				<div className="space-y-4 relative overflow-hidden rounded-xl">
-					<div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 animate-pulse"></div>
-					<Skeleton className="h-[200px] w-full rounded-xl relative z-10" />
-					<div className="space-y-2 relative z-10">
-						<Skeleton className="h-4 w-1/2" />
-						<Skeleton className="h-4 w-full" />
-						<Skeleton className="h-4 w-3/4" />
-					</div>
-				</div>
-			</div>
-		);
-	}
+	// This case is now handled above when !account && isAuthenticating
 
 	// Connected but not registered
 	if (!isRegistered) {
