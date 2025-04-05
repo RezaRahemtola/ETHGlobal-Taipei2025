@@ -26,7 +26,7 @@ class MultibaasService:
             bool: True if the username is available, False otherwise.
         """
         logger.debug(f"Checking if {username} is an available ENS subname")
-        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTAR_CONTRACT_LABEL}/methods/available"
+        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTRAR_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTRAR_CONTRACT_LABEL}/methods/available"
 
         args = {
             "args": [username],
@@ -58,7 +58,7 @@ class MultibaasService:
             bool: True if the registration was successful, False otherwise.
         """
         logger.debug(f"Registering ENS subname for username: {username}")
-        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTAR_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTAR_CONTRACT_LABEL}/methods/register"
+        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTRAR_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTRAR_CONTRACT_LABEL}/methods/register"
 
         args = {
             "args": [username, address],
@@ -92,7 +92,7 @@ class MultibaasService:
             bool: True if the avatar change was successful, False otherwise.
         """
         logger.debug(f"Changing ENS avatar for {ens} to {image_url}")
-        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTRY_CONTRACT_LABEL}/methods/setText"
+        api_url = f"{self.base_url}/api/v0/chains/ethereum/addresses/{config.CURVEGRID_ENS_REGISTRAR_CONTRACT_ADDRESS_ALIAS}/contracts/{config.CURVEGRID_ENS_REGISTRAR_CONTRACT_LABEL}/methods/setText"
 
         args = {
             "args": [namehash(ens), "avatar", image_url],

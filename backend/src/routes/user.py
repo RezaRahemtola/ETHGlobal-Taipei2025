@@ -44,9 +44,11 @@ async def change_avatar(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    await multibaas_service.change_ens_avatar(
+    success = await multibaas_service.change_ens_avatar(
         get_ens_from_username(user.username), image_url
     )
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update ENS avatar")
     return image_url
 
 

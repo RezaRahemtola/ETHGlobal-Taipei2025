@@ -91,7 +91,7 @@ export const Dashboard = () => {
 			<div className="flex bg-white rounded-xl overflow-hidden shadow-md">
 				<button
 					onClick={() => setActiveView("home")}
-					className={`flex-1 py-4 px-4 font-medium transition-colors ${
+					className={`cursor-pointer flex-1 py-4 px-4 font-medium transition-colors ${
 						activeView === "home"
 							? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-600"
 							: "text-slate-600 hover:bg-slate-50"
@@ -101,7 +101,7 @@ export const Dashboard = () => {
 				</button>
 				<button
 					onClick={() => setActiveView("send")}
-					className={`flex-1 py-4 px-4 font-medium transition-colors ${
+					className={`cursor-pointer flex-1 py-4 px-4 font-medium transition-colors ${
 						activeView === "send"
 							? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-600"
 							: "text-slate-600 hover:bg-slate-50"
@@ -111,7 +111,7 @@ export const Dashboard = () => {
 				</button>
 				<button
 					onClick={() => setActiveView("receive")}
-					className={`flex-1 py-4 px-4 font-medium transition-colors ${
+					className={`cursor-pointer flex-1 py-4 px-4 font-medium transition-colors ${
 						activeView === "receive"
 							? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-600"
 							: "text-slate-600 hover:bg-slate-50"
@@ -121,7 +121,7 @@ export const Dashboard = () => {
 				</button>
 				<button
 					onClick={() => setActiveView("history")}
-					className={`flex-1 py-4 px-4 font-medium transition-colors ${
+					className={`cursor-pointer flex-1 py-4 px-4 font-medium transition-colors ${
 						activeView === "history"
 							? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-600"
 							: "text-slate-600 hover:bg-slate-50"

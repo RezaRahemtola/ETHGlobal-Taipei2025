@@ -80,17 +80,10 @@ function AvatarUpload({ className }: Readonly<AvatarUploadProps>) {
 	return (
 		<div className={cn("relative", className)}>
 			<Avatar className="h-full w-full">
-				{isUploading ? (
-					<AvatarFallback className="bg-indigo-700">
-						<div className="size-6 border-2 border-white/30 border-t-white/90 rounded-full animate-spin" />
-					</AvatarFallback>
-				) : avatarUrl ? (
-					<AvatarImage src={avatarUrl} alt={username || "User avatar"} />
-				) : (
-					<AvatarFallback className="text-2xl bg-indigo-800 font-bold">
-						{username?.substring(0, 2).toUpperCase() ?? "UN"}
-					</AvatarFallback>
-				)}
+				<AvatarImage
+					src={avatarUrl ?? `https://avatars.jakerunzer.com/${username}.solva-app.eth`}
+					alt={username ?? "User avatar"}
+				/>
 			</Avatar>
 
 			<div
