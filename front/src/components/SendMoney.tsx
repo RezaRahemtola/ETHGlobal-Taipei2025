@@ -7,10 +7,11 @@ import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { ArrowRightIcon, BanknoteIcon, SendIcon, UserIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useQueryState } from "nuqs";
 
 export const SendMoney = () => {
-	const [recipient, setRecipient] = useState("");
-	const [amount, setAmount] = useState("");
+	const [recipient, setRecipient] = useQueryState("recipient", { defaultValue: "" });
+	const [amount, setAmount] = useQueryState("amount", { defaultValue: "" });
 	const [isSending, setIsSending] = useState(false);
 	const isMobile = useIsMobile();
 
