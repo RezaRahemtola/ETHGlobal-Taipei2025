@@ -47,6 +47,13 @@ export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
 
+/**
+ * Response model for user search.
+ */
+export type SearchUsersResponse = {
+    users: Array<UserSearchResult>;
+};
+
 export type ThirdwebWebhookPayload = {
     data: {
         [key: string]: unknown;
@@ -60,6 +67,15 @@ export type Transaction = {
     type: 'topup' | 'p2p';
     transaction_hash: string;
     created_at: string;
+};
+
+/**
+ * Model representing a user search result.
+ */
+export type UserSearchResult = {
+    username: string;
+    address: string;
+    avatar_url: string;
 };
 
 export type ValidationError = {
@@ -269,6 +285,40 @@ export type GetUserTransactionsUserTransactionsGetResponses = {
 };
 
 export type GetUserTransactionsUserTransactionsGetResponse = GetUserTransactionsUserTransactionsGetResponses[keyof GetUserTransactionsUserTransactionsGetResponses];
+
+export type SearchUsersUserSearchGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Search query for username or address
+         */
+        query: string;
+        /**
+         * Maximum number of results to return
+         */
+        limit?: number;
+    };
+    url: '/user/search';
+};
+
+export type SearchUsersUserSearchGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SearchUsersUserSearchGetError = SearchUsersUserSearchGetErrors[keyof SearchUsersUserSearchGetErrors];
+
+export type SearchUsersUserSearchGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: SearchUsersResponse;
+};
+
+export type SearchUsersUserSearchGetResponse = SearchUsersUserSearchGetResponses[keyof SearchUsersUserSearchGetResponses];
 
 export type ThirdwebWebhookThirdwebWebhookPostData = {
     body: ThirdwebWebhookPayload;

@@ -1,4 +1,5 @@
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 
 from src.models.base import SessionLocal
 from src.models.user import User
@@ -57,6 +58,40 @@ class UserService:
         db = self.get_db()
         try:
             return db.query(User).filter(User.address == address).first()
+        finally:
+            db.close()
+
+    async def search_users(
+        self, query: str, limit: int = 10, exclude_address: str | None = None
+    ) -> list[User]:
+        """
+        Search for users whose username matches the query.
+
+        Args:
+            query: The search query to match against usernames.
+            limit: Maximum number of results to return.
+            exclude_address: Optional address to exclude from results (typically the current user).
+
+        Returns:
+            list[User]: List of matching users.
+        """
+        logger.debug(f"Searching users with query: {query}")
+        db = self.get_db()
+        try:
+            # Search for usernames that contain the query or addresses that start with the query
+            search_pattern = f"%{query}%"
+            query_obj = db.query(User).filter(
+                or_(
+                    User.username.ilike(search_pattern), User.address.ilike(f"{query}%")
+                )
+            )
+
+            # Exclude the specified address if provided
+            if exclude_address:
+                query_obj = query_obj.filter(User.address != exclude_address)
+
+            users = query_obj.limit(limit).all()
+            return users
         finally:
             db.close()
 
