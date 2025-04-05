@@ -443,8 +443,9 @@ export const SendMoney = () => {
 				<div className="pt-2">
 					<div className="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
 						<p className="text-sm text-indigo-700">
-							<span className="font-semibold">Tip:</span> Send money instantly with zero fees. Your recipient will get
-							the funds in seconds!
+							<span className="font-semibold">
+								Funds are sent with zero fees. Your recipient will get the funds in seconds!
+							</span>
 						</p>
 					</div>
 				</div>

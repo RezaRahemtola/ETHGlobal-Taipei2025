@@ -150,5 +150,40 @@ class MultibaasService:
             logger.error(f"Error getting ENS avatar: {e}")
             return ""
 
+    async def create_webhook(self, url: str, label: str) -> dict:
+        """
+        Create a new webhook in Curvegrid.
+
+        Args:
+            url: The URL to send webhook events to.
+            label: A human-readable label for the webhook.
+
+        Returns:
+            dict: A dictionary containing the webhook ID and secret.
+        """
+        logger.debug(f"Creating webhook for URL: {url} with label: {label}")
+        api_url = f"{self.base_url}/api/v0/webhooks"
+
+        webhook_data = {"url": url, "label": label, "subscriptions": ["event.emitted"]}
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    api_url, headers=self.headers, json=webhook_data
+                ) as response:
+                    response.raise_for_status()
+                    result = await response.json()
+                    logger.info(
+                        f"Webhook created successfully with ID: {result.get("result", {}).get('id')}"
+                    )
+
+                    return {
+                        "webhook_id": result.get("result", {}).get("id"),
+                        "secret": result.get("result", {}).get("secret"),
+                    }
+        except Exception as e:
+            logger.error(f"Error creating webhook: {e}")
+            raise Exception(f"Failed to create webhook: {e}")
+
 
 multibaas_service = MultibaasService()

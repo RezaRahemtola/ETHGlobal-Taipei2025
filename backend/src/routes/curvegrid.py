@@ -7,7 +7,12 @@ from typing import Any
 from fastapi import HTTPException, Header, Request, APIRouter
 
 from src.config import config
-from src.interfaces.curvegrid import CurvegridPaymentWebhook
+from src.interfaces.curvegrid import (
+    CurvegridPaymentWebhook,
+    WebhookCreateRequest,
+    WebhookCreateResponse,
+)
+from src.services.multibaas import multibaas_service
 from src.services.transaction import transaction_service
 from src.services.user import user_service
 from src.utils.logger import setup_logger
@@ -23,7 +28,9 @@ MAX_WEBHOOK_AGE = 300
 USDC_DECIMALS = 6
 
 
-@router.post("/webhook", description="Receive webhooks from Curvegrid")
+@router.post(
+    "/internal-webhook", description="Receive internal webhooks from Curvegrid"
+)
 async def curvegrid_webhook(
     request: Request,
     payload: list[dict[str, Any]],
@@ -175,3 +182,29 @@ async def curvegrid_webhook(
     # If we didn't process any events, return a message indicating no supported events were found
     logger.info("No supported events found in webhook payload")
     return {"status": "ignored", "message": "No supported events found"}
+
+
+@router.post("/webhook", description="Create a new webhook in Curvegrid")
+async def create_webhook(request: WebhookCreateRequest) -> WebhookCreateResponse:
+    """
+    Create a new webhook in Curvegrid.
+
+    Args:
+        request: The webhook creation request data containing URL and label.
+
+    Returns:
+        WebhookCreateResponse: Contains webhook ID and secret for signature verification.
+    """
+    try:
+        result = await multibaas_service.create_webhook(
+            url=request.url, label=request.label
+        )
+
+        return WebhookCreateResponse(
+            webhook_id=result["webhook_id"], secret=result["secret"]
+        )
+    except Exception as e:
+        logger.error(f"Error creating webhook: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to create webhook: {str(e)}"
+        )
