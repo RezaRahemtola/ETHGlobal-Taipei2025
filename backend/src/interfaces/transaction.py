@@ -11,3 +11,7 @@ class Transaction(BaseModel):
     type: Literal["topup", "p2p"]
     transaction_hash: str
     created_at: datetime
+
+
+class GetTransactionsResponse(BaseModel):
+    transactions: list[Transaction]

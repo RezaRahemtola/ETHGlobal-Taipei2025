@@ -7,6 +7,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from src.models.base import Base  # Import the Base from your models
+from src.models.transaction import Transaction  # noqa
 
 # Import all models that should be included in migrations
 from src.models.user import User  # noqa

@@ -3,8 +3,10 @@ from fastapi import UploadFile, File, APIRouter, HTTPException
 from fastapi.params import Depends
 
 from src.config import config
+from src.interfaces.transaction import GetTransactionsResponse
 from src.services.auth import get_current_address
 from src.services.multibaas import multibaas_service
+from src.services.transaction import transaction_service
 from src.services.user import user_service
 from src.utils.ens import get_ens_from_username
 from src.utils.logger import setup_logger
@@ -62,3 +64,11 @@ async def get_avatar(user_address=Depends(get_current_address)) -> str:
         get_ens_from_username(user.username)
     )
     return avatar_url
+
+
+@router.get("/transactions", description="Get all transactions for the connected user")
+async def get_user_transactions(
+    user_address=Depends(get_current_address),
+) -> GetTransactionsResponse:
+    transactions = await transaction_service.get_user_transactions(user_address)
+    return GetTransactionsResponse(transactions=transactions)

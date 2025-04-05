@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import String, TIMESTAMP
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy.testing.schema import mapped_column
 
 from src.models.base import Base
 
@@ -19,3 +19,15 @@ class User(Base):
     )
 
     username: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+
+    # Relationships with transactions
+    sent_transactions = relationship(
+        "Transaction",
+        foreign_keys="Transaction.sender_username",
+        back_populates="sender",
+    )
+    received_transactions = relationship(
+        "Transaction",
+        foreign_keys="Transaction.receiver_username",
+        back_populates="receiver",
+    )

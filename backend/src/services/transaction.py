@@ -2,6 +2,7 @@ from typing import Literal
 
 from sqlalchemy.exc import IntegrityError
 
+from src.interfaces.transaction import Transaction as TransactionType
 from src.models.base import SessionLocal
 from src.models.transaction import Transaction
 from src.services.user import user_service
@@ -69,7 +70,7 @@ class TransactionService:
             db.close()
 
     @staticmethod
-    async def get_user_transactions(address: str) -> list[Transaction]:
+    async def get_user_transactions(address: str) -> list[TransactionType]:
         """
         Get all transactions for a user (both sent and received).
 
@@ -77,7 +78,7 @@ class TransactionService:
             address: The wallet address of the user.
 
         Returns:
-            list[Transaction]: List of transactions related to the user.
+            List of transactions related to the user.
         """
         logger.debug(f"Getting transactions for user with address {address}")
 
@@ -88,7 +89,7 @@ class TransactionService:
 
         db = SessionLocal()
         try:
-            transactions = (
+            transactions: list[Transaction] = (
                 db.query(Transaction)
                 .filter(
                     (Transaction.sender_username == user.username)
@@ -96,7 +97,17 @@ class TransactionService:
                 )
                 .all()
             )
-            return transactions
+            return [
+                TransactionType(
+                    receiver_username=tx.receiver_username,
+                    sender_username=tx.sender_username,
+                    amount=tx.amount,
+                    type=tx.type,
+                    transaction_hash=tx.transaction_hash,
+                    created_at=tx.created_at,
+                )
+                for tx in transactions
+            ]
         finally:
             db.close()
 
