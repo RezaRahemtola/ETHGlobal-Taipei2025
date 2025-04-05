@@ -1,5 +1,5 @@
 import { Transaction } from "@/stores/account";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 
 type MobileTransactionItemProps = {
 	transaction: Transaction;
@@ -20,7 +20,7 @@ export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProp
 			textColor: "text-emerald-500",
 		},
 		topup: {
-			icon: <ArrowRightIcon className="h-4 w-4 text-blue-500 rotate-180" />,
+			icon: <ArrowLeftIcon className="h-4 w-4 text-blue-500 rotate-180" />,
 			bgColor: "bg-blue-50",
 			textColor: "text-blue-500",
 		},
@@ -31,8 +31,7 @@ export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProp
 		day: "numeric",
 		hour: "numeric",
 		minute: "2-digit",
-		timeZone: "Asia/Taipei",
-	}).format(date);
+	}).format(new Date(date.getTime() + 8 * 60 * 60 * 1000)); // TODO: fix quick & dirty timezone
 
 	return (
 		<div className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">

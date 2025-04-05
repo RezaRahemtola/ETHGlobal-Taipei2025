@@ -126,7 +126,7 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 		day: "numeric",
 		hour: "2-digit",
 		minute: "2-digit",
-	}).format(date);
+	}).format(new Date(date.getTime() + 8 * 60 * 60 * 1000)); // TODO: fix quick & dirty timezone
 
 	return (
 		<div className="flex items-center justify-between p-5 hover:bg-slate-50 transition-colors">
