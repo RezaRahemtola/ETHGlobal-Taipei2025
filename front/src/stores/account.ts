@@ -312,7 +312,7 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 
 	topUpBalance: (amount: number) => {
 		const { balance, transactions } = get();
-		
+
 		// Create a new transaction for the top up
 		const newTransaction: Transaction = {
 			id: `tx-${Date.now()}`, // Simple ID generation
@@ -323,15 +323,15 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			status: "completed",
 			type: "received",
 		};
-		
+
 		// Update the balance and add the transaction
-		set({ 
+		set({
 			balance: balance + amount,
-			transactions: [newTransaction, ...transactions]
+			transactions: [newTransaction, ...transactions],
 		});
-		
+
 		toast.success(`Added $${amount.toFixed(2)} to your wallet`, {
-			description: "Your balance has been updated"
+			description: "Your balance has been updated",
 		});
 	},
 }));

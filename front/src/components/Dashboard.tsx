@@ -31,7 +31,7 @@ export const Dashboard = () => {
 
 	const url = useMemo(
 		() =>
-			`${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ""}?view=send&recipient=${username}`,
+			`${window.location.protocol}//${window.location.hostname}${window.location.port ?? ""}?view=send&recipient=${username}`,
 		[username],
 	);
 
@@ -82,7 +82,7 @@ export const Dashboard = () => {
 
 			{/* Content based on selected tab */}
 			<div className="bg-white rounded-xl shadow-md p-6 mb-6">
-				{activeView === "home" && <HomeView setActiveView={setActiveView} transactions={transactions} />}
+				{activeView === "home" && <HomeView setActiveView={setActiveView} />}
 
 				{activeView === "send" && (
 					<div>
