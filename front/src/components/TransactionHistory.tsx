@@ -1,6 +1,6 @@
 import { Transaction, useAccountStore } from "@/stores/account";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { ArrowDownIcon, ArrowUpIcon, ClockIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowLeftIcon, ArrowUpIcon, ClockIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 
 export const TransactionHistory = () => {
@@ -109,7 +109,7 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 			textColor: "text-emerald-500",
 		},
 		topup: {
-			icon: <ArrowDownIcon className="h-5 w-5 text-blue-500" />,
+			icon: <ArrowLeftIcon className="h-5 w-5 text-blue-500" />,
 			bgColor: "bg-blue-50",
 			textColor: "text-blue-500",
 		},
@@ -128,7 +128,7 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 				<div className={`${typeConfig.bgColor} rounded-full p-3`}>{typeConfig.icon}</div>
 				<div>
 					<p className="font-semibold text-slate-800">
-						{type === "sent" ? `To ${recipient}` : type === "received" ? `From ${recipient}` : `Top Up ${recipient}`}
+						{type === "sent" ? `To ${recipient}` : type === "received" ? `From ${recipient}` : `Top Up`}
 					</p>
 					<div className="flex items-center gap-2 mt-1">
 						<span className="text-sm text-slate-500">{formattedDate}</span>

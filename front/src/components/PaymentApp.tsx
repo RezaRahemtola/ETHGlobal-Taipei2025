@@ -23,7 +23,7 @@ export const PaymentApp = () => {
 							</div>
 
 							<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-700">
-								Connecting Wallet...
+								Connecting...
 							</h1>
 							<p className="text-slate-500">Please wait while we restore your session</p>
 						</div>

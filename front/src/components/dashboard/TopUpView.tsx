@@ -3,9 +3,19 @@ import { thirdwebClient } from "@/config/thirdweb.ts";
 import { polygon } from "thirdweb/chains";
 import { USDC_CONTRACT_ADDRESS } from "@/config/polygon.ts";
 import { useAccountStore } from "@/stores/account.ts";
+import { toast } from "sonner";
 
 export const TopUpView = () => {
-	const account = useAccountStore((state) => state.account);
+	const { account, fetchUSDCBalance, fetchTransactions } = useAccountStore();
+
+	const handleComplete = () => {
+		// Refresh balance and transactions after successful payment
+		fetchUSDCBalance();
+		fetchTransactions();
+		toast.success("Balance updated", {
+			description: "Your balance has been updated",
+		});
+	};
 
 	return (
 		<div className="max-w-md mx-auto">
@@ -35,6 +45,7 @@ export const TopUpView = () => {
 							chain: false,
 						},
 					},
+					onPurchaseSuccess: handleComplete,
 				}}
 			/>
 		</div>

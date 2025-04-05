@@ -97,7 +97,7 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 
 		// Fetch the USDC balance
 		state.fetchUSDCBalance();
-		
+
 		// Fetch transactions if the user is registered
 		if (isRegistered) {
 			state.fetchTransactions();
