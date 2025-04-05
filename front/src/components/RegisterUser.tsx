@@ -5,12 +5,20 @@ import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "./ui/
 import { Input } from "./ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { AlertCircleIcon, BadgeCheckIcon, CheckCircle2Icon, CheckIcon, UserIcon, XIcon } from "lucide-react";
+import {
+	AlertCircleIcon,
+	BadgeCheckIcon,
+	CheckCircle2Icon,
+	CheckIcon,
+	LogOutIcon,
+	UserIcon,
+	XIcon,
+} from "lucide-react";
 import { checkUsernameAuthAvailableEnsUsernameGet } from "@/apis/backend/sdk.gen";
 import { useDebounce } from "@/lib/utils";
 import { z } from "zod";
 import { thirdwebClient } from "@/config/thirdweb.ts";
-import { useEnsName } from "thirdweb/react";
+import { useActiveWallet, useDisconnect, useEnsName } from "thirdweb/react";
 
 // Define username schema with Zod
 const usernameSchema = z
@@ -30,7 +38,9 @@ export const RegisterUser = () => {
 	const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [validation, setValidation] = useState<ValidationResult>({ success: true });
-	const { registerUser, jwtToken } = useAccountStore();
+	const { registerUser, jwtToken, onDisconnect: onDisconnectStore } = useAccountStore();
+	const { disconnect } = useDisconnect();
+	const wallet = useActiveWallet();
 
 	// Debounce username input for availability check
 	const debouncedUsername = useDebounce(username, 500);
@@ -196,6 +206,14 @@ export const RegisterUser = () => {
 		client: thirdwebClient,
 		address: "0x7Ab98f6b22ECb42E27Dc9C7d2d488F69b5CDD0b2",
 	});
+
+	const handleDisconnect = () => {
+		if (wallet) {
+			disconnect(wallet);
+		}
+		onDisconnectStore();
+	};
+
 	return (
 		<div className="flex min-h-[80vh] items-center justify-center p-4">
 			<Card className="w-full max-w-md shadow-xl border-0 overflow-hidden">
@@ -265,7 +283,7 @@ export const RegisterUser = () => {
 					</div>
 				</CardContent>
 
-				<CardFooter className="px-8 pb-8 pt-0">
+				<CardFooter className="px-8 pb-8 pt-0 flex flex-col gap-4">
 					<Button
 						onClick={handleRegister}
 						disabled={isSubmitting || isChecking || !validation.success || isAvailable !== true}
@@ -280,6 +298,14 @@ export const RegisterUser = () => {
 							"Continue"
 						)}
 					</Button>
+
+					<button
+						onClick={handleDisconnect}
+						className="text-red-500 hover:text-red-600 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors"
+					>
+						<LogOutIcon className="h-3.5 w-3.5" />
+						Cancel and disconnect
+					</button>
 				</CardFooter>
 			</Card>
 		</div>

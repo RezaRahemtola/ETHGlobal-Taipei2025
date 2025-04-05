@@ -7,7 +7,7 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useQueryState } from "nuqs";
 
 export function Layout() {
-	const { account, onDisconnect: onDisconnectStore } = useAccountStore();
+	const { account, onDisconnect: onDisconnectStore, username } = useAccountStore();
 	const { disconnect } = useDisconnect();
 	const wallet = useActiveWallet();
 	const isMobile = useIsMobile();
@@ -93,8 +93,8 @@ export function Layout() {
 				</footer>
 			)}
 
-			{/* Mobile Bottom Navigation - only shown when connected and on mobile */}
-			{account && isMobile && (
+			{/* Mobile Bottom Navigation - only shown when connected, registered, and on mobile */}
+			{isMobile && username !== null && (
 				<nav className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t shadow-lg flex items-center justify-around h-16 px-1">
 					<MobileNavItem
 						icon={<HomeIcon className="h-5 w-5" />}
@@ -135,12 +135,12 @@ function MobileNavItem({
 	label,
 	onClick,
 	isActive,
-}: {
+}: Readonly<{
 	icon: React.ReactNode;
 	label: string;
 	onClick: () => void;
 	isActive: boolean;
-}) {
+}>) {
 	return (
 		<button
 			onClick={onClick}

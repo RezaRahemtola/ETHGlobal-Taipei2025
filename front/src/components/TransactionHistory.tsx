@@ -1,6 +1,6 @@
-import { useAccountStore, Transaction } from "@/stores/account";
+import { Transaction, useAccountStore } from "@/stores/account";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { ArrowDownIcon, ArrowUpIcon, CheckCircle2Icon, ClockIcon, XCircleIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, ClockIcon } from "lucide-react";
 
 export const TransactionHistory = () => {
 	const transactions = useAccountStore((state) => state.transactions);
@@ -53,28 +53,7 @@ export const TransactionHistory = () => {
 };
 
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
-	const { amount, recipient, date, status, type } = transaction;
-
-	const statusConfig = {
-		completed: {
-			icon: <CheckCircle2Icon className="h-5 w-5 text-emerald-500" />,
-			label: "Completed",
-			bgColor: "bg-emerald-50",
-			textColor: "text-emerald-700",
-		},
-		pending: {
-			icon: <ClockIcon className="h-5 w-5 text-amber-500" />,
-			label: "Pending",
-			bgColor: "bg-amber-50",
-			textColor: "text-amber-700",
-		},
-		failed: {
-			icon: <XCircleIcon className="h-5 w-5 text-red-500" />,
-			label: "Failed",
-			bgColor: "bg-red-50",
-			textColor: "text-red-700",
-		},
-	}[status];
+	const { amount, recipient, date, type } = transaction;
 
 	const typeConfig =
 		type === "sent"
@@ -104,12 +83,6 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 					<p className="font-semibold text-slate-800">{type === "sent" ? `To ${recipient}` : `From ${recipient}`}</p>
 					<div className="flex items-center gap-2 mt-1">
 						<span className="text-sm text-slate-500">{formattedDate}</span>
-						<span
-							className={`text-xs px-2 py-0.5 rounded-full ${statusConfig.bgColor} ${statusConfig.textColor} font-medium inline-flex items-center gap-1`}
-						>
-							{statusConfig.icon}
-							<span>{statusConfig.label}</span>
-						</span>
 					</div>
 				</div>
 			</div>
