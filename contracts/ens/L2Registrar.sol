@@ -75,10 +75,7 @@ contract L2Registrar is AccessControl {
     /// @notice Registers a new name
     /// @param label The label to register (e.g. "name" for "name.eth")
     /// @param owner The address that will own the name
-    function register(
-        string calldata label,
-        address owner
-    ) external onlyRole(ADMIN_ROLE) {
+    function register(string calldata label, address owner) external onlyRole(ADMIN_ROLE) {
         bytes32 node = _labelToNode(label);
         bytes memory addr = abi.encodePacked(owner); // Convert address to bytes
 
@@ -98,6 +95,11 @@ contract L2Registrar is AccessControl {
             new bytes[](0)
         );
         emit NameRegistered(label, owner);
+    }
+
+    // @notice Proxy the setText call for Curvegrid (no permissions on the registry)
+    function setText(bytes32 node, string calldata key, string calldata value) external onlyRole(ADMIN_ROLE) {
+        registry.setText(node, key, value);
     }
 
     /// @notice Checks if a given label is available for registration
