@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Transaction, useAccountStore } from "@/stores/account";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
-import { ArrowRightIcon, BanknoteIcon, SendIcon, UserIcon } from "lucide-react";
+import { ArrowRightIcon, BanknoteIcon, CheckIcon, SendIcon, UserIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useQueryState } from "nuqs";
+import { searchUsersUserSearchGet, UserSearchResult } from "@/apis/backend";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export const SendMoney = () => {
 	const [recipient, setRecipient] = useQueryState("recipient", { defaultValue: "" });
@@ -16,6 +18,73 @@ export const SendMoney = () => {
 	const isMobile = useIsMobile();
 
 	const { balance, transactions } = useAccountStore();
+
+	// Search functionality
+	const [searchQuery, setSearchQuery] = useState(recipient);
+	const debouncedSearchQuery = useDebounce(searchQuery, 300);
+	const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+	const [isSearching, setIsSearching] = useState(false);
+	const [showResults, setShowResults] = useState(false);
+	const searchRef = useRef<HTMLDivElement>(null);
+
+	// Clear search results when clicking outside
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+				setShowResults(false);
+			}
+		}
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
+	// Search for users when searchQuery changes
+	useEffect(() => {
+		const searchUsers = async () => {
+			if (!debouncedSearchQuery || debouncedSearchQuery.trim().length === 0) {
+				setSearchResults([]);
+				return;
+			}
+
+			setIsSearching(true);
+			try {
+				const response = await searchUsersUserSearchGet({
+					query: {
+						query: debouncedSearchQuery,
+						limit: 5,
+					},
+				});
+
+				if (response.data) {
+					setSearchResults(response.data.users);
+					setShowResults(true);
+				}
+			} catch (error) {
+				console.error("Error searching for users:", error);
+			} finally {
+				setIsSearching(false);
+			}
+		};
+
+		searchUsers();
+	}, [debouncedSearchQuery]);
+
+	// Update recipient state when search query changes
+	const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setSearchQuery(value);
+		setRecipient(value);
+	};
+
+	// Select a user from search results
+	const handleSelectUser = (username: string) => {
+		setRecipient(username);
+		setSearchQuery(username);
+		setShowResults(false);
+	};
 
 	const handleSend = () => {
 		const numAmount = parseFloat(amount);
@@ -64,6 +133,7 @@ export const SendMoney = () => {
 			// Reset form
 			setRecipient("");
 			setAmount("");
+			setSearchQuery("");
 			setIsSending(false);
 
 			// Simulate transaction completion after delay
@@ -89,26 +159,73 @@ export const SendMoney = () => {
 		}, 1500);
 	};
 
+	// Recipient input with search results
+	const recipientInput = (
+		<div className="space-y-3">
+			<Label htmlFor="recipient" className="flex items-center gap-2 text-base font-semibold">
+				<UserIcon className="h-4 w-4 text-indigo-500" />
+				Recipient
+			</Label>
+			<div className="relative" ref={searchRef}>
+				<Input
+					id="recipient"
+					placeholder="Search username"
+					value={searchQuery}
+					onChange={handleSearchInputChange}
+					onFocus={() => debouncedSearchQuery && setShowResults(true)}
+					className="pl-10 h-12 border-slate-300 focus-visible:ring-indigo-500"
+				/>
+				<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+					<span className="text-slate-400">@</span>
+				</div>
+
+				{/* Loading spinner */}
+				{isSearching && (
+					<div className="absolute inset-y-0 right-0 flex items-center pr-3">
+						<div className="h-4 w-4 rounded-full border-2 border-t-transparent border-indigo-500 animate-spin"></div>
+					</div>
+				)}
+
+				{/* Search results dropdown */}
+				{showResults && searchResults.length > 0 && (
+					<div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-slate-200 max-h-60 overflow-auto">
+						{searchResults.map((user) => (
+							<div
+								key={user.username}
+								className="flex items-center gap-2 p-3 hover:bg-slate-50 cursor-pointer"
+								onClick={() => handleSelectUser(user.username)}
+							>
+								{user.avatar_url ? (
+									<img src={user.avatar_url} alt={user.username} className="h-8 w-8 rounded-full object-cover" />
+								) : (
+									<div className="h-8 w-8 bg-indigo-100 rounded-full flex items-center justify-center">
+										<UserIcon className="h-4 w-4 text-indigo-600" />
+									</div>
+								)}
+								<div className="flex-1">
+									<p className="font-medium">{user.username}</p>
+								</div>
+								{user.username === searchQuery && <CheckIcon className="h-4 w-4 text-green-500" />}
+							</div>
+						))}
+					</div>
+				)}
+
+				{/* No results message */}
+				{showResults && debouncedSearchQuery && !isSearching && searchResults.length === 0 && (
+					<div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-slate-200">
+						<div className="p-3 text-center text-slate-500">
+							<p>No users found.</p>
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+
 	const formContent = (
 		<>
-			<div className="space-y-3">
-				<Label htmlFor="recipient" className="flex items-center gap-2 text-base font-semibold">
-					<UserIcon className="h-4 w-4 text-indigo-500" />
-					Recipient
-				</Label>
-				<div className="relative">
-					<Input
-						id="recipient"
-						placeholder="Enter name or username"
-						value={recipient}
-						onChange={(e) => setRecipient(e.target.value)}
-						className="pl-10 h-12 border-slate-300 focus-visible:ring-indigo-500"
-					/>
-					<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-						<span className="text-slate-400">@</span>
-					</div>
-				</div>
-			</div>
+			{recipientInput}
 
 			<div className="space-y-3">
 				<Label htmlFor="amount" className="flex items-center gap-2 text-base font-semibold">
