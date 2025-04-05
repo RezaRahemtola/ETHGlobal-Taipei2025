@@ -1,34 +1,39 @@
 import hashlib
 import hmac
+import json
 import time
 from typing import Any
 
 from fastapi import HTTPException, Header, Request, APIRouter
 
 from src.config import config
+from src.interfaces.curvegrid import CurvegridPaymentWebhook
 from src.services.transaction import transaction_service
+from src.services.user import user_service
 from src.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
 router = APIRouter(prefix="/curvegrid", tags=["Curvegrid"])
 
+
 # Maximum age of webhook in seconds before rejecting it (5 minutes)
 MAX_WEBHOOK_AGE = 300
+
+USDC_DECIMALS = 6
 
 
 @router.post("/webhook", description="Receive webhooks from Curvegrid")
 async def curvegrid_webhook(
     request: Request,
-    payload: Any,
+    payload: list[dict[str, Any]],
     signature: str = Header(None, alias="X-MultiBaas-Signature"),
     timestamp: str = Header(None, alias="X-MultiBaas-Timestamp"),
-) -> None:
+) -> dict[str, str]:
     """
-    Process webhooks from Thirdweb.
-    Currently only supports buyWithCryptoStatus events.
+    Process webhooks from Curvegrid.
 
-    Verifies the webhook signature using the THIRDWEB_WEBHOOK_SECRET and validates
+    Verifies the webhook signature using the CURVEGRID_WEBHOOK_SECRET and validates
     the timestamp to prevent replay attacks.
     """
     # Verify the webhook signature
@@ -62,54 +67,111 @@ async def curvegrid_webhook(
         logger.warning(f"Invalid timestamp format: {timestamp}")
         raise HTTPException(status_code=401, detail="Invalid timestamp format")
 
+    # Log the headers for debugging
+    logger.debug(f"Webhook headers: {dict(request.headers)}")
     # Get raw request body for signature verification
     body = await request.body()
-    body_str = body.decode("utf-8")
 
-    # Combine timestamp and body to create the payload for signature verification
-    signature_payload = f"{timestamp}.{body_str}"
-
-    # Calculate expected signature
-    expected_signature = hmac.new(
+    # Calculate expected signature according to Curvegrid's Go implementation
+    # Based on their code, they first hash the body, then the timestamp
+    mac = hmac.new(
         config.CURVEGRID_WEBHOOK_SECRET.encode(),
-        signature_payload.encode(),
+        body,  # Use the raw bytes directly
         hashlib.sha256,
-    ).hexdigest()
+    )
+    mac.update(timestamp.encode())
+    expected_signature = mac.hexdigest()
+
+    # Log for debugging
+    logger.debug(f"Calculated signature: {expected_signature}")
+    logger.debug(f"Received signature: {signature}")
 
     # Secure comparison to prevent timing attacks
     if not hmac.compare_digest(expected_signature, signature):
         logger.warning("Invalid webhook signature")
         raise HTTPException(status_code=401, detail="Invalid signature")
 
-    logger.debug(f"Received Curvegrid webhook: {payload.model_dump_json()}")
+    logger.debug(f"Received Curvegrid webhook: {json.dumps(payload, indent=2)}")
 
-    return
+    # Process PaymentCompleted events in the list
+    processed_payments = 0
+    successful_transactions = 0
 
-    crypto_data = payload.buy_with_crypto_status
-    if crypto_data is None or crypto_data.destination is None:
-        fiat_data = payload.buy_with_fiat_status
-        if fiat_data is None:
-            raise HTTPException(status_code=400, detail="Unsupported webhook type")
-        if fiat_data.status != "ON_RAMP_TRANSFER_COMPLETED":
-            logger.debug(f"Ignoring non-completed transaction: {fiat_data.status}")
-            return
-        transaction_hash = fiat_data.source.transactionHash
-        amount_usd = fiat_data.source.amountUSDCents / 100
-        address = fiat_data.purchaseData.userAddress
+    for event_item in payload:
+        try:
+            payment_webhook = CurvegridPaymentWebhook(**event_item)
+            logger.info(f"Processing Payment: {payment_webhook}")
+            processed_payments += 1
 
-    elif crypto_data.status != "COMPLETED":
-        logger.debug(f"Ignoring non-completed transaction: {crypto_data.status}")
-        return
-    else:
-        transaction_hash = crypto_data.destination.transactionHash
-        amount_usd = crypto_data.destination.amountUSDCents / 100
-        address = crypto_data.purchaseData.userAddress
+            # Extract sender and receiver from the event inputs
+            sender_address = None
+            receiver_address = None
+            amount = None
 
-    # Create transaction record - for topup, sender and receiver are the same
-    await transaction_service.create_transaction(
-        sender_address=address,
-        receiver_address=address,
-        amount=amount_usd,
-        transaction_type="topup",
-        transaction_hash=transaction_hash,
-    )
+            for input_data in payment_webhook.data.event.inputs:
+                if input_data.name == "from":
+                    sender_address = input_data.value
+                elif input_data.name == "to":
+                    receiver_address = input_data.value
+                elif input_data.name == "amount":
+                    try:
+                        # Convert string amount to int first, then to float with correct decimals
+                        raw_amount = int(input_data.value)
+                        # Convert from USDC 6 decimals to a human-readable amount
+                        amount = raw_amount / (10**USDC_DECIMALS)
+                        logger.info(f"Converted amount {raw_amount} to {amount} USDC")
+                    except ValueError:
+                        logger.error(f"Invalid amount format: {input_data.value}")
+                        continue
+
+            # Skip if any required data is missing
+            if not sender_address or not receiver_address or amount is None:
+                logger.warning(
+                    f"Missing required payment data: sender={sender_address}, receiver={receiver_address}, amount={amount}"
+                )
+                continue
+
+            # Check if both addresses belong to users in our database
+            sender_exists = await user_service.user_exists(sender_address)
+            receiver_exists = await user_service.user_exists(receiver_address)
+
+            if not sender_exists or not receiver_exists:
+                logger.info(
+                    f"Skipping transaction - one or both users not in database: sender={sender_address} ({sender_exists}), "
+                    f"receiver={receiver_address} ({receiver_exists})"
+                )
+                continue
+
+            # Create the p2p transaction
+            transaction = await transaction_service.create_transaction(
+                sender_address=sender_address,
+                receiver_address=receiver_address,
+                amount=amount,
+                transaction_type="p2p",
+                transaction_hash=payment_webhook.data.transaction.txHash,
+            )
+
+            if transaction:
+                logger.info(
+                    f"Successfully created p2p transaction: {transaction.transaction_hash}"
+                )
+                successful_transactions += 1
+            else:
+                logger.error("Failed to create p2p transaction")
+
+        except ValueError as e:
+            logger.info(f"Not a PaymentCompleted event or validation error: {str(e)}")
+            # Continue processing other events in the list
+        except Exception as e:
+            logger.error(f"Error processing PaymentCompleted event: {str(e)}")
+            # Continue with other events
+
+    if processed_payments > 0:
+        return {
+            "status": "success",
+            "message": f"Processed {processed_payments} payment transactions, created {successful_transactions} p2p transactions",
+        }
+
+    # If we didn't process any events, return a message indicating no supported events were found
+    logger.info("No supported events found in webhook payload")
+    return {"status": "ignored", "message": "No supported events found"}
