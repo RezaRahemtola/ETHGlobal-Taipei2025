@@ -97,18 +97,23 @@ export const TransactionHistory = () => {
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 	const { amount, recipient, date, type } = transaction;
 
-	const typeConfig =
-		type === "sent"
-			? {
-					icon: <ArrowUpIcon className="h-5 w-5 text-rose-500" />,
-					bgColor: "bg-rose-50",
-					textColor: "text-rose-500",
-				}
-			: {
-					icon: <ArrowDownIcon className="h-5 w-5 text-emerald-500" />,
-					bgColor: "bg-emerald-50",
-					textColor: "text-emerald-500",
-				};
+	const typeConfig = {
+		sent: {
+			icon: <ArrowUpIcon className="h-5 w-5 text-rose-500" />,
+			bgColor: "bg-rose-50",
+			textColor: "text-rose-500",
+		},
+		received: {
+			icon: <ArrowDownIcon className="h-5 w-5 text-emerald-500" />,
+			bgColor: "bg-emerald-50",
+			textColor: "text-emerald-500",
+		},
+		topup: {
+			icon: <ArrowDownIcon className="h-5 w-5 text-blue-500" />,
+			bgColor: "bg-blue-50",
+			textColor: "text-blue-500",
+		}
+	}[type];
 
 	const formattedDate = new Intl.DateTimeFormat("en-US", {
 		month: "short",
@@ -122,7 +127,11 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 			<div className="flex items-center space-x-4">
 				<div className={`${typeConfig.bgColor} rounded-full p-3`}>{typeConfig.icon}</div>
 				<div>
-					<p className="font-semibold text-slate-800">{type === "sent" ? `To ${recipient}` : `From ${recipient}`}</p>
+					<p className="font-semibold text-slate-800">
+						{type === "sent" ? `To ${recipient}` : 
+						 type === "received" ? `From ${recipient}` : 
+						 `Top Up ${recipient}`}
+					</p>
 					<div className="flex items-center gap-2 mt-1">
 						<span className="text-sm text-slate-500">{formattedDate}</span>
 					</div>

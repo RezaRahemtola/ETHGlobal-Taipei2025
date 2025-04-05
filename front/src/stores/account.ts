@@ -44,7 +44,7 @@ export type Transaction = {
 	recipientAddress: string;
 	date: Date;
 	status: "completed" | "pending" | "failed";
-	type: "sent" | "received";
+	type: "sent" | "received" | "topup";
 };
 
 // Mock transactions
@@ -75,6 +75,15 @@ const mockTransactions: Transaction[] = [
 		date: new Date(),
 		status: "pending",
 		type: "sent",
+	},
+	{
+		id: "4",
+		amount: 100,
+		recipient: "Wallet",
+		recipientAddress: "self",
+		date: new Date(Date.now() - 86400000 * 0.5), // 12 hours ago
+		status: "completed",
+		type: "topup",
 	},
 ];
 

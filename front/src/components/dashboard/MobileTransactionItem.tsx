@@ -8,18 +8,23 @@ type MobileTransactionItemProps = {
 export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProps) => {
 	const { amount, recipient, date, type } = transaction;
 
-	const typeConfig =
-		type === "sent"
-			? {
-					icon: <ArrowRightIcon className="h-4 w-4 text-rose-500" />,
-					bgColor: "bg-rose-50",
-					textColor: "text-rose-500",
-				}
-			: {
-					icon: <ArrowRightIcon className="h-4 w-4 text-emerald-500 rotate-180" />,
-					bgColor: "bg-emerald-50",
-					textColor: "text-emerald-500",
-				};
+	const typeConfig = {
+		sent: {
+			icon: <ArrowRightIcon className="h-4 w-4 text-rose-500" />,
+			bgColor: "bg-rose-50",
+			textColor: "text-rose-500",
+		},
+		received: {
+			icon: <ArrowRightIcon className="h-4 w-4 text-emerald-500 rotate-180" />,
+			bgColor: "bg-emerald-50",
+			textColor: "text-emerald-500",
+		},
+		topup: {
+			icon: <ArrowRightIcon className="h-4 w-4 text-blue-500 rotate-180" />,
+			bgColor: "bg-blue-50",
+			textColor: "text-blue-500",
+		}
+	}[type];
 
 	const formattedDate = new Intl.DateTimeFormat("en-US", {
 		month: "short",
@@ -31,7 +36,11 @@ export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProp
 			<div className="flex items-center space-x-3">
 				<div className={`${typeConfig.bgColor} rounded-full p-2`}>{typeConfig.icon}</div>
 				<div>
-					<p className="font-medium text-slate-800">{type === "sent" ? `To ${recipient}` : `From ${recipient}`}</p>
+					<p className="font-medium text-slate-800">
+						{type === "sent" ? `To ${recipient}` : 
+						 type === "received" ? `From ${recipient}` : 
+						 `Top Up ${recipient}`}
+					</p>
 					<p className="text-xs text-slate-500">{formattedDate}</p>
 				</div>
 			</div>

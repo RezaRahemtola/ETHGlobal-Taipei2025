@@ -11,6 +11,7 @@ from src.interfaces.thirdweb import (
     ThirdwebBuyWithFiatWebhook,
     ThirdwebBuyWithCryptoWebhook,
 )
+from src.services.transaction import transaction_service
 from src.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -117,7 +118,7 @@ async def thirdweb_webhook(
             return
         transaction_hash = fiat_data.source.transactionHash
         amount_usd = fiat_data.source.amountUSDCents / 100
-        sender_address = fiat_data.purchaseData.userAddress
+        address = fiat_data.purchaseData.userAddress
 
     elif crypto_data.status != "COMPLETED":
         logger.debug(f"Ignoring non-completed transaction: {crypto_data.status}")
@@ -125,3 +126,13 @@ async def thirdweb_webhook(
     else:
         transaction_hash = crypto_data.destination.transactionHash
         amount_usd = crypto_data.destination.amountUSDCents / 100
+        address = crypto_data.purchaseData.userAddress
+
+    # Create transaction record - for topup, sender and receiver are the same
+    await transaction_service.create_transaction(
+        sender_address=address,
+        receiver_address=address,
+        amount=amount_usd,
+        transaction_type="topup",
+        transaction_hash=transaction_hash,
+    )
