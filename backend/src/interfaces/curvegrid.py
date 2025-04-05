@@ -34,3 +34,8 @@ class WebhookCreateResponse(BaseModel):
     secret: str = Field(
         ..., description="The webhook secret for signature verification"
     )
+
+
+class WebhookDeleteRequest(BaseModel):
+    webhook_id: int = Field(..., description="The ID of the webhook to delete")
+    secret: str = Field(..., description="The secret of the webhook for verification")

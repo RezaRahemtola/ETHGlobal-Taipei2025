@@ -174,7 +174,7 @@ class MultibaasService:
                     response.raise_for_status()
                     result = await response.json()
                     logger.info(
-                        f"Webhook created successfully with ID: {result.get("result", {}).get('id')}"
+                        f"Webhook created successfully with ID: {result.get('result', {}).get('id')}"
                     )
 
                     return {
@@ -184,6 +184,57 @@ class MultibaasService:
         except Exception as e:
             logger.error(f"Error creating webhook: {e}")
             raise Exception(f"Failed to create webhook: {e}")
+            
+    async def get_webhook(self, webhook_id: int) -> dict:
+        """
+        Get webhook details from Curvegrid.
+        
+        Args:
+            webhook_id: The ID of the webhook to retrieve.
+            
+        Returns:
+            dict: The webhook details.
+        """
+        logger.debug(f"Getting webhook with ID: {webhook_id}")
+        api_url = f"{self.base_url}/api/v0/webhooks/{webhook_id}"
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    api_url, headers=self.headers
+                ) as response:
+                    response.raise_for_status()
+                    result = await response.json()
+                    logger.debug(f"Retrieved webhook: {result}")
+                    return result.get("result", {})
+        except Exception as e:
+            logger.error(f"Error getting webhook: {e}")
+            raise Exception(f"Failed to get webhook: {e}")
+            
+    async def delete_webhook(self, webhook_id: int) -> bool:
+        """
+        Delete a webhook from Curvegrid.
+        
+        Args:
+            webhook_id: The ID of the webhook to delete.
+            
+        Returns:
+            bool: True if deletion was successful.
+        """
+        logger.debug(f"Deleting webhook with ID: {webhook_id}")
+        api_url = f"{self.base_url}/api/v0/webhooks/{webhook_id}"
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.delete(
+                    api_url, headers=self.headers
+                ) as response:
+                    response.raise_for_status()
+                    logger.info(f"Successfully deleted webhook with ID: {webhook_id}")
+                    return True
+        except Exception as e:
+            logger.error(f"Error deleting webhook: {e}")
+            raise Exception(f"Failed to delete webhook: {e}")
 
 
 multibaas_service = MultibaasService()

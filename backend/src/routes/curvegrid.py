@@ -11,6 +11,7 @@ from src.interfaces.curvegrid import (
     CurvegridPaymentWebhook,
     WebhookCreateRequest,
     WebhookCreateResponse,
+    WebhookDeleteRequest,
 )
 from src.services.multibaas import multibaas_service
 from src.services.transaction import transaction_service
@@ -207,4 +208,55 @@ async def create_webhook(request: WebhookCreateRequest) -> WebhookCreateResponse
         logger.error(f"Error creating webhook: {e}")
         raise HTTPException(
             status_code=500, detail=f"Failed to create webhook: {str(e)}"
+        )
+
+
+@router.delete("/webhook", description="Delete a webhook in Curvegrid")
+async def delete_webhook(request: WebhookDeleteRequest) -> dict:
+    """
+    Delete a webhook in Curvegrid.
+    
+    Args:
+        request: The webhook deletion request containing webhook ID and secret.
+        
+    Returns:
+        dict: A status message.
+    """
+    try:
+        # Get the webhook to verify the secret
+        webhook = await multibaas_service.get_webhook(webhook_id=request.webhook_id)
+        
+        # Check if the webhook exists
+        if not webhook:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Webhook with ID {request.webhook_id} not found"
+            )
+        
+        # Verify that the secret matches
+        if webhook.get("secret") != request.secret:
+            logger.warning(f"Invalid secret provided for webhook ID: {request.webhook_id}")
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid webhook secret"
+            )
+        
+        # Delete the webhook if secret matches
+        success = await multibaas_service.delete_webhook(webhook_id=request.webhook_id)
+        
+        if success:
+            return {"status": "success", "message": f"Webhook {request.webhook_id} deleted successfully"}
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to delete webhook {request.webhook_id}"
+            )
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting webhook: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete webhook: {str(e)}"
         )
