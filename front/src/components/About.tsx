@@ -25,13 +25,13 @@ export function About() {
 					icon={<ZapIcon className="h-6 w-6 text-white" />}
 					iconBg="bg-amber-500"
 					title="Instant Transfers"
-					description="Send money in seconds, not days. Our blockchain technology ensures your transfers happen at lightning speed."
+					description="Send money in seconds, not days. Powered by blockchain, your transfers happen at lightning speed."
 				/>
 				<FeatureCard
 					icon={<ShieldCheckIcon className="h-6 w-6 text-white" />}
 					iconBg="bg-emerald-500"
 					title="Secure & Private"
-					description="Your finances are protected with enterprise-grade security. We never share your information with third parties."
+					description="Your underlying wallets are always accessed in secure enclaves. You can take control of it yourself at any time."
 				/>
 				<FeatureCard
 					icon={<CoinsIcon className="h-6 w-6 text-white" />}
