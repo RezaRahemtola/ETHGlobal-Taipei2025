@@ -1,7 +1,7 @@
-import { Transaction } from "@/stores/account";
+import { Transaction, useAccountStore } from "@/stores/account";
 import { AvatarUpload } from "../ui/avatar";
 import { Card, CardContent } from "../ui/card";
-import { ArrowRightIcon, HistoryIcon, SendIcon, ArrowDownIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowRightIcon, HistoryIcon, SendIcon } from "lucide-react";
 import { QuickActionButton } from "./QuickActionButton";
 import { MobileTransactionItem } from "./MobileTransactionItem";
 
@@ -15,6 +15,7 @@ type MobileHomeViewProps = {
 export const MobileHomeView = ({ username, balance, transactions, onActionClick }: MobileHomeViewProps) => {
 	// Get the latest 3 transactions
 	const recentTransactions = transactions.slice(0, 3);
+	const isLoadingBalance = useAccountStore((state) => state.isLoadingBalance);
 
 	return (
 		<div className="space-y-6 pb-4">
@@ -34,7 +35,7 @@ export const MobileHomeView = ({ username, balance, transactions, onActionClick 
 					<p className="text-white/70 text-sm font-medium mb-1">Available Balance</p>
 					<h1 className="text-4xl font-bold flex items-baseline">
 						<span className="text-xl mr-1">$</span>
-						{balance.toFixed(2)}
+						{isLoadingBalance ? <span className="animate-pulse">...</span> : balance.toFixed(2)}
 					</h1>
 				</div>
 			</div>

@@ -1,6 +1,7 @@
 import { AvatarUpload } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { PlusCircleIcon } from "lucide-react";
+import { useAccountStore } from "@/stores/account.ts";
 
 type DashboardHeaderProps = {
 	username: string | null;
@@ -9,6 +10,8 @@ type DashboardHeaderProps = {
 };
 
 export const DashboardHeader = ({ username, balance, setActiveView }: DashboardHeaderProps) => {
+	const isLoadingBalance = useAccountStore((state) => state.isLoadingBalance);
+
 	return (
 		<div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white rounded-xl shadow-xl">
 			<div className="flex items-center gap-6 mb-8">
@@ -32,7 +35,7 @@ export const DashboardHeader = ({ username, balance, setActiveView }: DashboardH
 				</div>
 				<h1 className="text-5xl font-bold flex items-baseline">
 					<span className="text-2xl mr-1">$</span>
-					{balance.toFixed(2)}
+					{isLoadingBalance ? <span className="animate-pulse">...</span> : balance.toFixed(2)}
 				</h1>
 			</div>
 		</div>

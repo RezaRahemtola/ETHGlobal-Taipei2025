@@ -1,14 +1,18 @@
 import { create } from "zustand";
 import { Account } from "thirdweb/wallets";
+import { getBalance } from "thirdweb/extensions/erc20";
 import {
+	changeAvatarUserAvatarPost,
 	getAuthMessageAuthMessagePost,
+	getAvatarUserAvatarGet,
+	isRegisteredAuthIsRegisteredGet,
 	loginWithWalletAuthLoginPost,
 	registerUserAuthRegisterPost,
-	isRegisteredAuthIsRegisteredGet,
-	getAvatarUserAvatarGet,
-	changeAvatarUserAvatarPost,
 } from "@/apis/backend/sdk.gen";
 import { toast } from "sonner";
+import { getContract } from "thirdweb";
+import { thirdwebClient } from "@/config/thirdweb.ts";
+import { polygon } from "thirdweb/chains";
 
 type AccountStoreState = {
 	account: Account | null;
@@ -18,6 +22,7 @@ type AccountStoreState = {
 	username: string | null;
 	avatarUrl: string | null;
 	balance: number;
+	isLoadingBalance: boolean;
 	transactions: Transaction[];
 
 	onAccountChange: (newAccount: Account | undefined) => Promise<void>;
@@ -28,6 +33,7 @@ type AccountStoreState = {
 	fetchAvatar: () => Promise<void>;
 	uploadAvatar: (file: File) => Promise<boolean>;
 	topUpBalance: (amount: number) => void;
+	fetchUSDCBalance: () => Promise<void>;
 };
 
 export type Transaction = {
@@ -71,6 +77,9 @@ const mockTransactions: Transaction[] = [
 	},
 ];
 
+// USDC contract address on Polygon
+const USDC_CONTRACT_ADDRESS = "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359";
+
 export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	account: null,
 	jwtToken: null,
@@ -78,7 +87,8 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	isRegistered: false,
 	username: null,
 	avatarUrl: null,
-	balance: 100,
+	balance: 0,
+	isLoadingBalance: false,
 	transactions: [...mockTransactions],
 
 	onAccountChange: async (newAccount: Account | undefined) => {
@@ -115,6 +125,9 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			account: newAccount,
 			isRegistered,
 		});
+
+		// Fetch the USDC balance
+		state.fetchUSDCBalance();
 	},
 
 	authenticate: async (account: Account): Promise<boolean> => {
@@ -307,7 +320,47 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			isRegistered: false,
 			username: null,
 			avatarUrl: null,
+			balance: 0,
 		});
+	},
+
+	fetchUSDCBalance: async () => {
+		const { account } = get();
+
+		if (!account) {
+			return;
+		}
+
+		try {
+			set({ isLoadingBalance: true });
+
+			// Get the contract instance
+			const contract = getContract({
+				client: thirdwebClient,
+				chain: polygon,
+				address: USDC_CONTRACT_ADDRESS,
+			});
+
+			// Get the balance
+			const balanceResult = await getBalance({
+				contract,
+				address: account.address,
+			});
+
+			// Convert from wei to dollars (USDC has 6 decimals)
+			const balanceInDollars = parseFloat(balanceResult.displayValue);
+
+			set({
+				balance: balanceInDollars,
+				isLoadingBalance: false,
+			});
+		} catch (error) {
+			console.error("Error fetching USDC balance:", error);
+			set({ isLoadingBalance: false });
+			toast.error("Failed to fetch balance", {
+				description: error instanceof Error ? error.message : "Unknown error",
+			});
+		}
 	},
 
 	topUpBalance: (amount: number) => {

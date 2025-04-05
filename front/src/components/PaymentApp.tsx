@@ -2,7 +2,6 @@ import { useAccountStore } from "@/stores/account";
 import { AccountConnect } from "./AccountConnect";
 import { RegisterUser } from "./RegisterUser";
 import { Dashboard } from "./Dashboard";
-import { Skeleton } from "./ui/skeleton";
 import { ArrowDownIcon, CoinsIcon, SparklesIcon, WalletIcon } from "lucide-react";
 import { smoothScrollTo } from "@/lib/utils";
 
@@ -32,7 +31,7 @@ export const PaymentApp = () => {
 				</div>
 			);
 		}
-		
+
 		// Normal connection flow when not authenticating
 		return (
 			<div
