@@ -293,7 +293,7 @@ export const SendMoney = () => {
 							) : (
 								<CheckCircle2Icon className="h-5 w-5 text-green-600" />
 							)}
-							<span className="font-medium">Approve USDC Transfer</span>
+							<span className="font-medium">Approve Transfer</span>
 						</div>
 						{approveCompleted && <span className="text-sm text-green-600">Completed</span>}
 					</div>
@@ -320,8 +320,8 @@ export const SendMoney = () => {
 
 					<p className="text-sm text-slate-700 mt-3">
 						{transactionStep === "approve"
-							? `Approving ${amount} USDC token transfer...`
-							: `Sending ${amount} USDC to ${recipient}...`}
+							? `Approving $${amount} transfer...`
+							: `Sending $${amount} to ${recipient}...`}
 					</p>
 				</div>
 			);
