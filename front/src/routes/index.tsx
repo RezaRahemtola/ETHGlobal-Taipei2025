@@ -25,11 +25,6 @@ function Index() {
 			setLoaded(true);
 		}, 150);
 
-		// Apply special optimization for mobile devices
-		if (isMobile) {
-			document.body.classList.add("mobile-device");
-		}
-
 		// Add scroll event listener to track scroll position for animations
 		const handleScroll = () => {
 			if (window.scrollY > 50) {

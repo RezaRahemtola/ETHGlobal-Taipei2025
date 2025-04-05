@@ -26,9 +26,6 @@ export function Layout() {
 		// Add event listeners
 		window.addEventListener("scroll", handleScroll);
 
-		// Add mobile class to body for performance optimizations
-		document.body.classList.toggle("mobile-device", isMobile);
-
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
 		};

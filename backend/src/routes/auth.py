@@ -24,7 +24,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 def auth_message(address: str) -> str:
-    return f"Sign to authenticate with LibertAI with your wallet: {format_eth_address(address)}"
+    return f"Sign to authenticate with Solva with your wallet: {format_eth_address(address)}"
 
 
 @router.post("/message")

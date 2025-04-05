@@ -199,15 +199,6 @@
     animation-direction: reverse;
 }
 
-/* Mobile optimization class - applied to body in JavaScript */
-.mobile-device .animate-gradient-shift {
-    animation-duration: 30s; /* Slower on mobile for better performance */
-}
-
-.mobile-device .animate-float-slow,
-.mobile-device .animate-float-slow-reverse {
-    animation-duration: 20s; /* Much slower on mobile */
-}
 
 /* Touch-specific classes */
 .touch-manipulation {
@@ -228,6 +219,7 @@ html {
     .animate-float-slow,
     .animate-float-slow-reverse {
         animation-play-state: paused;
+        animation-duration: 20s; /* Much slower on mobile */
     }
 
     /* Improve touch response on all buttons */

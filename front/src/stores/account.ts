@@ -27,6 +27,7 @@ type AccountStoreState = {
 	registerUser: (username: string) => Promise<boolean>;
 	fetchAvatar: () => Promise<void>;
 	uploadAvatar: (file: File) => Promise<boolean>;
+	topUpBalance: (amount: number) => void;
 };
 
 export type Transaction = {
@@ -306,6 +307,31 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			isRegistered: false,
 			username: null,
 			avatarUrl: null,
+		});
+	},
+
+	topUpBalance: (amount: number) => {
+		const { balance, transactions } = get();
+		
+		// Create a new transaction for the top up
+		const newTransaction: Transaction = {
+			id: `tx-${Date.now()}`, // Simple ID generation
+			amount: amount,
+			recipient: "Wallet",
+			recipientAddress: "self",
+			date: new Date(),
+			status: "completed",
+			type: "received",
+		};
+		
+		// Update the balance and add the transaction
+		set({ 
+			balance: balance + amount,
+			transactions: [newTransaction, ...transactions]
+		});
+		
+		toast.success(`Added $${amount.toFixed(2)} to your wallet`, {
+			description: "Your balance has been updated"
 		});
 	},
 }));

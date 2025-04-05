@@ -2,19 +2,37 @@ import { Transaction, useAccountStore } from "@/stores/account";
 import { TransactionHistory } from "./TransactionHistory";
 import { SendMoney } from "./SendMoney";
 import { AvatarUpload } from "./ui/avatar";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { ArrowDownIcon, ArrowRightIcon, ClipboardCopyIcon, HistoryIcon, SendIcon, ShareIcon } from "lucide-react";
+import {
+	ArrowDownIcon,
+	ArrowRightIcon,
+	ClipboardCopyIcon,
+	HistoryIcon,
+	PlusCircleIcon,
+	SendIcon,
+	ShareIcon,
+} from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { useQueryState } from "nuqs";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { Input } from "./ui/input";
 
 export const Dashboard = () => {
-	const { username, balance, transactions } = useAccountStore();
+	const { username, balance, transactions, topUpBalance } = useAccountStore();
 	const isMobile = useIsMobile();
 	const [activeView, setActiveView] = useQueryState("view", { defaultValue: "home" });
+	const [topUpAmount, setTopUpAmount] = useState(50);
+
+	const handleTopUp = () => {
+		if (topUpAmount <= 0) {
+			toast.error("Please enter a valid amount");
+			return;
+		}
+		topUpBalance(topUpAmount);
+	};
 
 	const url = useMemo(
 		() =>
@@ -115,7 +133,16 @@ export const Dashboard = () => {
 				</div>
 
 				<div className="bg-white/10 p-6 rounded-xl backdrop-blur-md">
-					<p className="text-white/70 font-medium mb-1">Available Balance</p>
+					<div className="flex justify-between items-center">
+						<p className="text-white/70 font-medium mb-1">Available Balance</p>
+						<Button
+							size="sm"
+							onClick={() => setActiveView("topup")}
+							className="bg-green-500 hover:bg-green-600 text-white text-xs px-3"
+						>
+							<PlusCircleIcon className="h-3 w-3 mr-1" /> Top Up
+						</Button>
+					</div>
 					<h1 className="text-5xl font-bold flex items-baseline">
 						<span className="text-2xl mr-1">$</span>
 						{balance.toFixed(2)}
@@ -162,6 +189,16 @@ export const Dashboard = () => {
 					Receive Money
 				</button>
 				<button
+					onClick={() => setActiveView("topup")}
+					className={`cursor-pointer flex-1 py-4 px-4 font-medium transition-colors ${
+						activeView === "topup"
+							? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-600"
+							: "text-slate-600 hover:bg-slate-50"
+					}`}
+				>
+					Top Up
+				</button>
+				<button
 					onClick={() => setActiveView("history")}
 					className={`cursor-pointer flex-1 py-4 px-4 font-medium transition-colors ${
 						activeView === "history"
@@ -169,7 +206,7 @@ export const Dashboard = () => {
 							: "text-slate-600 hover:bg-slate-50"
 					}`}
 				>
-					Transaction History
+					History
 				</button>
 			</div>
 
@@ -267,6 +304,59 @@ export const Dashboard = () => {
 										Share Link
 									</Button>
 								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{activeView === "topup" && (
+					<div className="max-w-md mx-auto">
+						<h3 className="text-xl font-bold text-slate-800 mb-6">Top Up Your Balance</h3>
+						<div className="bg-slate-50 p-8 rounded-lg">
+							<div className="space-y-6">
+								<div>
+									<p className="text-slate-600 mb-2">Enter amount to add</p>
+									<div className="flex items-start gap-4">
+										<div className="flex-1">
+											<div className="relative">
+												<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+													<span className="text-slate-500 text-lg">$</span>
+												</div>
+												<Input
+													type="number"
+													value={topUpAmount}
+													onChange={(e) => setTopUpAmount(parseFloat(e.target.value) || 0)}
+													className="pl-8 text-lg h-14"
+													min="1"
+													step="10"
+												/>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div className="grid grid-cols-3 gap-3">
+									{[50, 100, 250].map((amount) => (
+										<Button
+											key={amount}
+											variant={topUpAmount === amount ? "default" : "outline"}
+											className="py-3"
+											onClick={() => setTopUpAmount(amount)}
+										>
+											${amount}
+										</Button>
+									))}
+								</div>
+
+								<Button
+									onClick={handleTopUp}
+									className="w-full py-6 text-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+								>
+									<PlusCircleIcon className="h-5 w-5 mr-2" />
+									Add Funds
+								</Button>
+
+								<p className="text-xs text-slate-500 text-center">This is a demo app. No real money will be charged.</p>
 							</div>
 						</div>
 					</div>
