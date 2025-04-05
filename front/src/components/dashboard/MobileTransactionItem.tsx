@@ -31,6 +31,7 @@ export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProp
 		day: "numeric",
 		hour: "numeric",
 		minute: "2-digit",
+		timeZone: "Asia/Taipei",
 	}).format(date);
 
 	return (
