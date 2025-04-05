@@ -29,6 +29,8 @@ export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProp
 	const formattedDate = new Intl.DateTimeFormat("en-US", {
 		month: "short",
 		day: "numeric",
+		hour: "numeric",
+		minute: "2-digit",
 	}).format(date);
 
 	return (
@@ -37,7 +39,7 @@ export const MobileTransactionItem = ({ transaction }: MobileTransactionItemProp
 				<div className={`${typeConfig.bgColor} rounded-full p-2`}>{typeConfig.icon}</div>
 				<div>
 					<p className="font-medium text-slate-800">
-						{type === "sent" ? `To ${recipient}` : type === "received" ? `From ${recipient}` : `Top Up ${recipient}`}
+						{type === "sent" ? `To ${recipient}` : type === "received" ? `From ${recipient}` : `Top Up`}
 					</p>
 					<p className="text-xs text-slate-500">{formattedDate}</p>
 				</div>

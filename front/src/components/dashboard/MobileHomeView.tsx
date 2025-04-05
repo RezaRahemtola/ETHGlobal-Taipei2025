@@ -14,7 +14,8 @@ type MobileHomeViewProps = {
 
 export const MobileHomeView = ({ username, balance, transactions, onActionClick }: MobileHomeViewProps) => {
 	// Get the latest 3 transactions
-	const recentTransactions = transactions.slice(0, 3);
+	const recentTransactions = [...transactions].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 3);
+
 	const isLoadingBalance = useAccountStore((state) => state.isLoadingBalance);
 
 	return (

@@ -2,9 +2,15 @@ import { Transaction, useAccountStore } from "@/stores/account";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ArrowDownIcon, ArrowLeftIcon, ArrowUpIcon, ClockIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useMemo } from "react";
 
 export const TransactionHistory = () => {
 	const transactions = useAccountStore((state) => state.transactions);
+	// Sort transactions by date (most recent first)
+	const sortedTransactions = useMemo(
+		() => [...transactions].sort((a, b) => b.date.getTime() - a.date.getTime()),
+		[transactions],
+	);
 	const isMobile = useIsMobile();
 
 	if (transactions.length === 0) {
@@ -66,7 +72,7 @@ export const TransactionHistory = () => {
 			</div>
 			<div className="rounded-lg overflow-hidden bg-white shadow-sm">
 				<div className="divide-y">
-					{transactions.map((transaction) => (
+					{sortedTransactions.map((transaction) => (
 						<TransactionItem key={transaction.id} transaction={transaction} />
 					))}
 				</div>
@@ -85,7 +91,7 @@ export const TransactionHistory = () => {
 			</CardHeader>
 			<CardContent className="p-0">
 				<div className="divide-y">
-					{transactions.map((transaction) => (
+					{sortedTransactions.map((transaction) => (
 						<TransactionItem key={transaction.id} transaction={transaction} />
 					))}
 				</div>

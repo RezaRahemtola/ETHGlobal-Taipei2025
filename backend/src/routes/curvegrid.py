@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import json
 import time
 from typing import Any
 
@@ -98,8 +97,6 @@ async def curvegrid_webhook(
     if not hmac.compare_digest(expected_signature, signature):
         logger.warning("Invalid webhook signature")
         raise HTTPException(status_code=401, detail="Invalid signature")
-
-    logger.debug(f"Received Curvegrid webhook: {json.dumps(payload, indent=2)}")
 
     # Process PaymentCompleted events in the list
     processed_payments = 0
@@ -215,41 +212,42 @@ async def create_webhook(request: WebhookCreateRequest) -> WebhookCreateResponse
 async def delete_webhook(request: WebhookDeleteRequest) -> dict:
     """
     Delete a webhook in Curvegrid.
-    
+
     Args:
         request: The webhook deletion request containing webhook ID and secret.
-        
+
     Returns:
         dict: A status message.
     """
     try:
         # Get the webhook to verify the secret
         webhook = await multibaas_service.get_webhook(webhook_id=request.webhook_id)
-        
+
         # Check if the webhook exists
         if not webhook:
             raise HTTPException(
                 status_code=404,
-                detail=f"Webhook with ID {request.webhook_id} not found"
+                detail=f"Webhook with ID {request.webhook_id} not found",
             )
-        
+
         # Verify that the secret matches
         if webhook.get("secret") != request.secret:
-            logger.warning(f"Invalid secret provided for webhook ID: {request.webhook_id}")
-            raise HTTPException(
-                status_code=403,
-                detail="Invalid webhook secret"
+            logger.warning(
+                f"Invalid secret provided for webhook ID: {request.webhook_id}"
             )
-        
+            raise HTTPException(status_code=403, detail="Invalid webhook secret")
+
         # Delete the webhook if secret matches
         success = await multibaas_service.delete_webhook(webhook_id=request.webhook_id)
-        
+
         if success:
-            return {"status": "success", "message": f"Webhook {request.webhook_id} deleted successfully"}
+            return {
+                "status": "success",
+                "message": f"Webhook {request.webhook_id} deleted successfully",
+            }
         else:
             raise HTTPException(
-                status_code=500,
-                detail=f"Failed to delete webhook {request.webhook_id}"
+                status_code=500, detail=f"Failed to delete webhook {request.webhook_id}"
             )
     except HTTPException:
         # Re-raise HTTP exceptions
@@ -257,6 +255,5 @@ async def delete_webhook(request: WebhookDeleteRequest) -> dict:
     except Exception as e:
         logger.error(f"Error deleting webhook: {e}")
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to delete webhook: {str(e)}"
+            status_code=500, detail=f"Failed to delete webhook: {str(e)}"
         )

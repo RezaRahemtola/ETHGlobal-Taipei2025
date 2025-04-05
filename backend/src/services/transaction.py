@@ -102,7 +102,7 @@ class TransactionService:
                     receiver_username=tx.receiver_username,
                     sender_username=tx.sender_username,
                     amount=tx.amount,
-                    type=tx.type,
+                    type=tx.type,  # type: ignore
                     transaction_hash=tx.transaction_hash,
                     created_at=tx.created_at,
                 )
