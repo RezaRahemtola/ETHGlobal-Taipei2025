@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.config import config
 from src.routes.auth import router as auth_router
+from src.routes.curvegrid import router as curvegrid_router
 from src.routes.thirdweb import router as thirdweb_router
 from src.routes.user import router as user_router
 
@@ -29,3 +30,4 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(thirdweb_router)
+app.include_router(curvegrid_router)

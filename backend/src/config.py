@@ -12,6 +12,7 @@ class _Config:
     CURVEGRID_HSM_ADDRESS: str
     CURVEGRID_ENS_REGISTRY_CONTRACT_LABEL: str
     CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS: str
+    CURVEGRID_WEBHOOK_SECRET: str
 
     LOG_LEVEL: int
     LOG_FILE: str | None
@@ -41,6 +42,7 @@ class _Config:
         self.CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS = os.getenv(
             "CURVEGRID_ENS_REGISTRY_CONTRACT_ADDRESS_ALIAS"
         )
+        self.CURVEGRID_WEBHOOK_SECRET = os.getenv("CURVEGRID_WEBHOOK_SECRET")
 
         # Configure logging
         log_level_str = os.getenv("LOG_LEVEL", "INFO").upper()
