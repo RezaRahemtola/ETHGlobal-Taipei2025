@@ -112,7 +112,7 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 			icon: <ArrowDownIcon className="h-5 w-5 text-blue-500" />,
 			bgColor: "bg-blue-50",
 			textColor: "text-blue-500",
-		}
+		},
 	}[type];
 
 	const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -128,9 +128,7 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
 				<div className={`${typeConfig.bgColor} rounded-full p-3`}>{typeConfig.icon}</div>
 				<div>
 					<p className="font-semibold text-slate-800">
-						{type === "sent" ? `To ${recipient}` : 
-						 type === "received" ? `From ${recipient}` : 
-						 `Top Up ${recipient}`}
+						{type === "sent" ? `To ${recipient}` : type === "received" ? `From ${recipient}` : `Top Up ${recipient}`}
 					</p>
 					<div className="flex items-center gap-2 mt-1">
 						<span className="text-sm text-slate-500">{formattedDate}</span>

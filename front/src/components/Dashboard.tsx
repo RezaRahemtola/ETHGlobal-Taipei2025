@@ -1,10 +1,9 @@
 import { useAccountStore } from "@/stores/account";
 import { SendMoney } from "./SendMoney";
 import { TransactionHistory } from "./TransactionHistory";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useQueryState } from "nuqs";
-import { toast } from "sonner";
 
 import {
 	DashboardHeader,
@@ -16,18 +15,9 @@ import {
 } from "./dashboard/index";
 
 export const Dashboard = () => {
-	const { username, balance, transactions, topUpBalance } = useAccountStore();
+	const { username, balance, transactions } = useAccountStore();
 	const isMobile = useIsMobile();
 	const [activeView, setActiveView] = useQueryState("view", { defaultValue: "home" });
-	const [topUpAmount, setTopUpAmount] = useState(50);
-
-	const handleTopUp = () => {
-		if (topUpAmount <= 0) {
-			toast.error("Please enter a valid amount");
-			return;
-		}
-		topUpBalance(topUpAmount);
-	};
 
 	const url = useMemo(
 		() =>
@@ -64,7 +54,7 @@ export const Dashboard = () => {
 
 				{activeView === "topup" && (
 					<div className="p-4">
-						<TopUpView topUpAmount={topUpAmount} setTopUpAmount={setTopUpAmount} handleTopUp={handleTopUp} />
+						<TopUpView />
 					</div>
 				)}
 			</div>
@@ -93,9 +83,7 @@ export const Dashboard = () => {
 
 				{activeView === "receive" && <ReceiveView username={username} url={url} />}
 
-				{activeView === "topup" && (
-					<TopUpView topUpAmount={topUpAmount} setTopUpAmount={setTopUpAmount} handleTopUp={handleTopUp} />
-				)}
+				{activeView === "topup" && <TopUpView />}
 
 				{activeView === "history" && (
 					<div>
