@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { getContract } from "thirdweb";
 import { thirdwebClient } from "@/config/thirdweb.ts";
 import { polygon } from "thirdweb/chains";
+import { USDC_CONTRACT_ADDRESS } from "@/config/polygon.ts";
 
 type AccountStoreState = {
 	account: Account | null;
@@ -76,9 +77,6 @@ const mockTransactions: Transaction[] = [
 		type: "sent",
 	},
 ];
-
-// USDC contract address on Polygon
-const USDC_CONTRACT_ADDRESS = "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359";
 
 export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	account: null,

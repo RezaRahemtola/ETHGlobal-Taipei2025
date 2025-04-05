@@ -22,6 +22,7 @@ class _Config:
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int
     IS_DEVELOPMENT: bool
     PINATA_JWT: str
+    THIRDWEB_WEBHOOK_SECRET: str
 
     def __init__(self):
         load_dotenv()
@@ -54,6 +55,7 @@ class _Config:
         )
         self.IS_DEVELOPMENT = os.getenv("IS_DEVELOPMENT", "False").lower() == "true"
         self.PINATA_JWT = os.getenv("PINATA_JWT")
+        self.THIRDWEB_WEBHOOK_SECRET = os.getenv("THIRDWEB_WEBHOOK_SECRET")
 
 
 config = _Config()
