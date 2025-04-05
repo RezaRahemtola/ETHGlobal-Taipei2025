@@ -102,8 +102,6 @@ class MultibaasService:
             "contractOverride": False,
         }
 
-        print(args)
-
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(

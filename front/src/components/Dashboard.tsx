@@ -2,16 +2,25 @@ import { Transaction, useAccountStore } from "@/stores/account";
 import { TransactionHistory } from "./TransactionHistory";
 import { SendMoney } from "./SendMoney";
 import { AvatarUpload } from "./ui/avatar";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { ArrowDownIcon, ArrowRightIcon, HistoryIcon, SendIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowRightIcon, ClipboardCopyIcon, HistoryIcon, SendIcon, ShareIcon } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { useQueryState } from "nuqs";
+import { QRCodeSVG } from "qrcode.react";
+import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 export const Dashboard = () => {
 	const { username, balance, transactions } = useAccountStore();
 	const isMobile = useIsMobile();
 	const [activeView, setActiveView] = useQueryState("view", { defaultValue: "home" });
+
+	const url = useMemo(
+		() =>
+			`${window.location.protocol}//${window.location.hostname}${window.location.port ?? ""}?view=send&recipient=${username}`,
+		[username],
+	);
 
 	// Mobile layout with different sections based on the active view
 	if (isMobile) {
@@ -36,14 +45,68 @@ export const Dashboard = () => {
 					<div className="p-4">
 						<div className="space-y-4">
 							<h2 className="text-xl font-bold">Receive Money</h2>
-							<p className="text-slate-600">Share your username with friends to receive money:</p>
-							<div className="bg-slate-50 p-6 rounded-lg flex items-center justify-center">
+							<p className="text-slate-600">Scan this QR code to receive money:</p>
+							<div className="bg-slate-50 p-6 rounded-lg">
 								<div className="text-center">
-									<div className="h-24 w-24 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
-										<ArrowDownIcon className="h-10 w-10 text-emerald-600" />
+									<div className="p-3 bg-white rounded-lg mb-4 mx-auto inline-block shadow-sm">
+										<QRCodeSVG value={url} size={150} bgColor={"#ffffff"} fgColor={"#000000"} level={"L"} />
 									</div>
-									<p className="text-lg font-bold text-slate-900">{username}</p>
-									<p className="text-sm text-slate-600 mt-1">Your username</p>
+
+									<div className="bg-white py-3 px-4 rounded-lg shadow-sm mb-4 flex items-center justify-between">
+										<div>
+											<p className="text-sm text-slate-600">Your username</p>
+											<p className="text-lg font-bold text-slate-900">{username}</p>
+										</div>
+
+										<div className="flex gap-2">
+											<Button
+												size="sm"
+												variant="outline"
+												className="flex items-center gap-1 text-xs"
+												onClick={() => {
+													navigator.clipboard.writeText(username ?? "");
+													toast.success("Username copied to clipboard");
+												}}
+											>
+												<ClipboardCopyIcon className="h-3.5 w-3.5" />
+												Copy
+											</Button>
+											<Button
+												size="sm"
+												variant="outline"
+												className="flex items-center gap-1 text-xs"
+												onClick={() => {
+													if (navigator.share) {
+														navigator
+															.share({
+																title: "Send me money",
+																text: `Send money to ${username}`,
+																url: url,
+															})
+															.catch();
+													} else {
+														toast.error("Sharing not supported on this device");
+													}
+												}}
+											>
+												<ShareIcon className="h-3.5 w-3.5" />
+												Share
+											</Button>
+										</div>
+									</div>
+
+									<Button
+										className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+										onClick={() => {
+											navigator.clipboard.writeText(url);
+											toast.success("Payment link copied to clipboard", {
+												description: "Share this link with anyone who wants to send you money",
+											});
+										}}
+									>
+										<ClipboardCopyIcon className="h-4 w-4 mr-2" />
+										Copy Payment Link
+									</Button>
 								</div>
 							</div>
 						</div>
@@ -184,14 +247,68 @@ export const Dashboard = () => {
 				{activeView === "receive" && (
 					<div className="max-w-md mx-auto">
 						<h3 className="text-xl font-bold text-slate-800 mb-6">Receive Money</h3>
-						<p className="text-slate-600 mb-6">Share your username with friends to receive money:</p>
-						<div className="bg-slate-50 p-8 rounded-lg flex items-center justify-center">
+						<p className="text-slate-600 mb-6">Scan this QR code to receive money:</p>
+						<div className="bg-slate-50 p-8 rounded-lg">
 							<div className="text-center">
-								<div className="h-32 w-32 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
-									<ArrowDownIcon className="h-12 w-12 text-emerald-600" />
+								<div className="p-4 bg-white rounded-lg mb-6 mx-auto inline-block shadow-md">
+									<QRCodeSVG value={url} size={200} bgColor={"#ffffff"} fgColor={"#000000"} level={"L"} />
 								</div>
-								<p className="text-2xl font-bold text-slate-900">{username}</p>
-								<p className="text-sm text-slate-600 mt-1">Your username</p>
+
+								<div className="bg-white py-4 px-6 rounded-lg shadow-sm mb-6 flex items-center justify-between">
+									<div>
+										<p className="text-sm text-slate-600">Your username</p>
+										<p className="text-2xl font-bold text-slate-900">{username}</p>
+									</div>
+
+									<div className="flex gap-2">
+										<Button
+											size="sm"
+											variant="outline"
+											className="flex items-center gap-1"
+											onClick={() => {
+												navigator.clipboard.writeText(username ?? "");
+												toast.success("Username copied to clipboard");
+											}}
+										>
+											<ClipboardCopyIcon className="h-4 w-4" />
+											Copy
+										</Button>
+										<Button
+											size="sm"
+											variant="outline"
+											className="flex items-center gap-1"
+											onClick={() => {
+												if (navigator.share) {
+													navigator
+														.share({
+															title: "Send me money",
+															text: `Send money to ${username}`,
+															url: url,
+														})
+														.catch((error) => toast.error("Sharing failed", { description: error.message }));
+												} else {
+													toast.error("Sharing not supported on this device");
+												}
+											}}
+										>
+											<ShareIcon className="h-4 w-4" />
+											Share
+										</Button>
+									</div>
+								</div>
+
+								<Button
+									className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+									onClick={() => {
+										navigator.clipboard.writeText(url);
+										toast.success("Payment link copied to clipboard", {
+											description: "Share this link with anyone who wants to send you money",
+										});
+									}}
+								>
+									<ClipboardCopyIcon className="h-4 w-4 mr-2" />
+									Copy Payment Link
+								</Button>
 							</div>
 						</div>
 					</div>
