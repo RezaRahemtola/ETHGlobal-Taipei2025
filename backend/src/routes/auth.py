@@ -41,7 +41,7 @@ async def login_with_wallet(
     """Authenticate with a wallet signature."""
     if not is_eth_signature_valid(
         auth_message(request.address),
-        f"0x{request.signature[578 : 578 + 130]}",  # Extracting the actual signature from the payload
+        request.signature,
         request.address,
     ):
         raise HTTPException(
