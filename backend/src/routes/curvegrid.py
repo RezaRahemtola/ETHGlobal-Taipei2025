@@ -109,9 +109,9 @@ async def curvegrid_webhook(
             amount = None
 
             for input_data in payment_webhook.data.event.inputs:
-                if input_data.name == "from":
+                if input_data.name == "sender":
                     sender_address = input_data.value
-                elif input_data.name == "to":
+                elif input_data.name == "receiver":
                     receiver_address = input_data.value
                 elif input_data.name == "amount":
                     try:
@@ -125,7 +125,7 @@ async def curvegrid_webhook(
                         continue
 
             # Skip if any required data is missing
-            if not sender_address or not receiver_address or amount is None:
+            if sender_address is None or receiver_address is None or amount is None:
                 logger.warning(
                     f"Missing required payment data: sender={sender_address}, receiver={receiver_address}, amount={amount}"
                 )
