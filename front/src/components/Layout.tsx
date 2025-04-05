@@ -2,7 +2,7 @@ import { Link, Outlet } from "@tanstack/react-router";
 import { useAccountStore } from "@/stores/account";
 import { HistoryIcon, HomeIcon, LogOutIcon, SendIcon } from "lucide-react";
 import { useActiveWallet, useDisconnect } from "thirdweb/react";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useQueryState } from "nuqs";
 
@@ -133,7 +133,7 @@ function MobileNavItem({
 	onClick,
 	isActive,
 }: Readonly<{
-	icon: React.ReactNode;
+	icon: ReactNode;
 	label: string;
 	onClick: () => void;
 	isActive: boolean;
