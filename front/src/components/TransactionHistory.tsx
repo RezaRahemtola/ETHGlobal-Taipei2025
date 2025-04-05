@@ -1,14 +1,37 @@
 import { Transaction, useAccountStore } from "@/stores/account";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ArrowDownIcon, ArrowUpIcon, ClockIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 export const TransactionHistory = () => {
 	const transactions = useAccountStore((state) => state.transactions);
+	const isMobile = useIsMobile();
 
 	if (transactions.length === 0) {
-		return (
+		return isMobile ? (
+			<div className="space-y-4">
+				<div className="pb-2">
+					<div className="flex items-center gap-2 text-2xl font-bold">
+						<span className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+							<ClockIcon className="h-4 w-4 text-indigo-600" />
+						</span>
+						Transaction History
+					</div>
+					<div className="text-muted-foreground">Your recent transactions will appear here</div>
+				</div>
+				<div className="text-center py-8 text-muted-foreground">
+					<div className="bg-slate-50 p-6 rounded-xl inline-flex flex-col items-center">
+						<div className="rounded-full bg-slate-100 p-4 mb-4">
+							<ClockIcon className="h-8 w-8 text-slate-400" />
+						</div>
+						<p className="font-medium text-slate-600">No transactions yet</p>
+						<p className="text-sm text-slate-400 mt-1">Send some money to get started</p>
+					</div>
+				</div>
+			</div>
+		) : (
 			<Card className="border-0 shadow-lg overflow-hidden">
-				<CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 pb-8">
+				<CardHeader className="pb-8">
 					<CardTitle className="flex items-center gap-2 text-2xl font-bold">
 						<span className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
 							<ClockIcon className="h-4 w-4 text-indigo-600" />
@@ -30,9 +53,28 @@ export const TransactionHistory = () => {
 		);
 	}
 
-	return (
+	return isMobile ? (
+		<div className="space-y-4">
+			<div className="pb-2">
+				<div className="flex items-center gap-2 text-2xl font-bold">
+					<span className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+						<ClockIcon className="h-4 w-4 text-indigo-600" />
+					</span>
+					Transaction History
+				</div>
+				<div className="text-muted-foreground">Your recent transactions</div>
+			</div>
+			<div className="rounded-lg overflow-hidden bg-white shadow-sm">
+				<div className="divide-y">
+					{transactions.map((transaction) => (
+						<TransactionItem key={transaction.id} transaction={transaction} />
+					))}
+				</div>
+			</div>
+		</div>
+	) : (
 		<Card className="border-0 shadow-lg overflow-hidden">
-			<CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100">
+			<CardHeader>
 				<CardTitle className="flex items-center gap-2 text-2xl font-bold">
 					<span className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
 						<ClockIcon className="h-4 w-4 text-indigo-600" />

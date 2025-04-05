@@ -35,6 +35,10 @@ export type AuthRegisterResponse = {
     success: boolean;
 };
 
+export type BodyChangeAvatarUserAvatarPost = {
+    file: Blob | File;
+};
+
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -171,6 +175,56 @@ export type IsRegisteredAuthIsRegisteredGetResponses = {
 };
 
 export type IsRegisteredAuthIsRegisteredGetResponse = IsRegisteredAuthIsRegisteredGetResponses[keyof IsRegisteredAuthIsRegisteredGetResponses];
+
+export type GetAvatarUserAvatarGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/user/avatar';
+};
+
+export type GetAvatarUserAvatarGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetAvatarUserAvatarGetError = GetAvatarUserAvatarGetErrors[keyof GetAvatarUserAvatarGetErrors];
+
+export type GetAvatarUserAvatarGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: string;
+};
+
+export type GetAvatarUserAvatarGetResponse = GetAvatarUserAvatarGetResponses[keyof GetAvatarUserAvatarGetResponses];
+
+export type ChangeAvatarUserAvatarPostData = {
+    body: BodyChangeAvatarUserAvatarPost;
+    path?: never;
+    query?: never;
+    url: '/user/avatar';
+};
+
+export type ChangeAvatarUserAvatarPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ChangeAvatarUserAvatarPostError = ChangeAvatarUserAvatarPostErrors[keyof ChangeAvatarUserAvatarPostErrors];
+
+export type ChangeAvatarUserAvatarPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: string;
+};
+
+export type ChangeAvatarUserAvatarPostResponse = ChangeAvatarUserAvatarPostResponses[keyof ChangeAvatarUserAvatarPostResponses];
 
 export type ClientOptions = {
     baseURL: 'http://localhost:8000' | (string & {});

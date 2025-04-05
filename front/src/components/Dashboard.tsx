@@ -1,7 +1,7 @@
 import { Transaction, useAccountStore } from "@/stores/account";
 import { TransactionHistory } from "./TransactionHistory";
 import { SendMoney } from "./SendMoney";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { AvatarUpload } from "./ui/avatar";
 import { ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { ArrowDownIcon, ArrowRightIcon, HistoryIcon, SendIcon } from "lucide-react";
@@ -65,11 +65,7 @@ export const Dashboard = () => {
 			{/* Header with greeting and balance */}
 			<div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-8 text-white rounded-xl shadow-xl">
 				<div className="flex items-center gap-6 mb-8">
-					<Avatar className="h-20 w-20 border-4 border-white/20 shadow-xl">
-						<AvatarFallback className="text-2xl bg-indigo-800 font-bold">
-							{username?.substring(0, 2).toUpperCase() ?? "UN"}
-						</AvatarFallback>
-					</Avatar>
+					<AvatarUpload className="h-20 w-20" />
 					<div>
 						<p className="text-white/70 text-lg">Welcome back,</p>
 						<h2 className="text-3xl font-bold">{username}</h2>
@@ -136,9 +132,9 @@ export const Dashboard = () => {
 			</div>
 
 			{/* Content based on selected tab */}
-			<div className="bg-white rounded-xl shadow-md p-6">
+			<div className="bg-white rounded-xl shadow-md p-6 mb-6">
 				{activeView === "home" && (
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 						<div className="lg:col-span-1">
 							<Card className="border-0 shadow-md overflow-hidden">
 								<CardContent className="p-5">
@@ -233,11 +229,7 @@ const MobileHomeView = ({
 			<div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-5 pt-8 pb-16 text-white">
 				<div className="flex items-center justify-between mb-4">
 					<div className="flex items-center gap-3">
-						<Avatar className="h-12 w-12 border-2 border-white/20">
-							<AvatarFallback className="text-lg bg-indigo-800 font-bold">
-								{username?.substring(0, 2).toUpperCase() ?? "UN"}
-							</AvatarFallback>
-						</Avatar>
+						<AvatarUpload className="h-12 w-12" />
 						<div>
 							<p className="text-white/80 text-sm">Welcome back</p>
 							<h2 className="text-xl font-bold">{username}</h2>
@@ -391,7 +383,7 @@ const QuickDesktopButton = ({
 	return (
 		<button
 			onClick={onClick}
-			className="border border-slate-200 rounded-lg p-4 flex flex-col items-center gap-2 hover:shadow-md hover:border-indigo-100 transition-all"
+			className="border border-slate-200 rounded-lg p-4 flex flex-col items-center gap-2 hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer"
 		>
 			<div className={`${color} p-3 rounded-full`}>{icon}</div>
 			<span className="text-sm font-medium text-slate-800">{label}</span>

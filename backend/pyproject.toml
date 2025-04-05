@@ -18,6 +18,7 @@ aiohttp = "^3.11.16"
 sqlalchemy = { extras = ["mypy"], version = "^2.0.39" }
 alembic = "^1.15.1"
 psycopg2-binary = "^2.9.10"
+python-multipart = "^0.0.20"
 
 
 [tool.poetry.group.dev.dependencies]

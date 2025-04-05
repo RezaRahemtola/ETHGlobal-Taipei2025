@@ -21,6 +21,7 @@ class _Config:
     JWT_SECRET: str
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int
     IS_DEVELOPMENT: bool
+    PINATA_JWT: str
 
     def __init__(self):
         load_dotenv()
@@ -52,6 +53,7 @@ class _Config:
             os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES")
         )
         self.IS_DEVELOPMENT = os.getenv("IS_DEVELOPMENT", "False").lower() == "true"
+        self.PINATA_JWT = os.getenv("PINATA_JWT")
 
 
 config = _Config()

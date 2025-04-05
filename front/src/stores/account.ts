@@ -5,6 +5,8 @@ import {
 	loginWithWalletAuthLoginPost,
 	registerUserAuthRegisterPost,
 	isRegisteredAuthIsRegisteredGet,
+	getAvatarUserAvatarGet,
+	changeAvatarUserAvatarPost,
 } from "@/apis/backend/sdk.gen";
 import { toast } from "sonner";
 
@@ -14,6 +16,7 @@ type AccountStoreState = {
 	isAuthenticating: boolean;
 	isRegistered: boolean;
 	username: string | null;
+	avatarUrl: string | null;
 	balance: number;
 	transactions: Transaction[];
 
@@ -22,6 +25,8 @@ type AccountStoreState = {
 	authenticate: (account: Account) => Promise<boolean>;
 	checkRegistration: () => Promise<boolean>;
 	registerUser: (username: string) => Promise<boolean>;
+	fetchAvatar: () => Promise<void>;
+	uploadAvatar: (file: File) => Promise<boolean>;
 };
 
 export type Transaction = {
@@ -71,6 +76,7 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 	isAuthenticating: false,
 	isRegistered: false,
 	username: null,
+	avatarUrl: null,
 	balance: 100,
 	transactions: [...mockTransactions],
 
@@ -171,6 +177,9 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 				// If user is registered and has a username, update the username in the store
 				if (registered && username) {
 					set({ username });
+					// Fetch avatar after setting username
+					const state = get();
+					state.fetchAvatar();
 				}
 
 				return registered;
@@ -179,6 +188,67 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			return false;
 		} catch (error) {
 			console.error("Error checking registration status:", error);
+			return false;
+		}
+	},
+
+	fetchAvatar: async (): Promise<void> => {
+		const { jwtToken } = get();
+
+		if (!jwtToken) {
+			return;
+		}
+
+		try {
+			const response = await getAvatarUserAvatarGet({
+				headers: {
+					Authorization: `Bearer ${jwtToken}`,
+				},
+			});
+
+			if (response.data) {
+				set({ avatarUrl: response.data });
+			}
+		} catch (error) {
+			console.error("Error fetching avatar:", error);
+			// Don't show toast for avatar fetch failure - it's not critical
+		}
+	},
+
+	uploadAvatar: async (file: File): Promise<boolean> => {
+		const { jwtToken } = get();
+
+		if (!jwtToken) {
+			toast.error("Authentication required", {
+				description: "Please connect your wallet first",
+			});
+			return false;
+		}
+
+		try {
+			const response = await changeAvatarUserAvatarPost({
+				body: {
+					file,
+				},
+				headers: {
+					Authorization: `Bearer ${jwtToken}`,
+				},
+			});
+
+			if (response.status === 200 && response.data) {
+				// Use the URL returned directly instead of fetching again
+				set({ avatarUrl: response.data });
+				toast.success("Avatar updated successfully");
+				return true;
+			} else {
+				toast.error("Failed to update avatar");
+				return false;
+			}
+		} catch (error) {
+			console.error("Error uploading avatar:", error);
+			toast.error("Avatar upload failed", {
+				description: error instanceof Error ? error.message : "Unknown error",
+			});
 			return false;
 		}
 	},
@@ -235,6 +305,7 @@ export const useAccountStore = create<AccountStoreState>((set, get) => ({
 			jwtToken: null,
 			isRegistered: false,
 			username: null,
+			avatarUrl: null,
 		});
 	},
 }));
