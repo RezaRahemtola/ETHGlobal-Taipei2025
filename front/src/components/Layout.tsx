@@ -1,6 +1,6 @@
 import { Link, Outlet } from "@tanstack/react-router";
 import { useAccountStore } from "@/stores/account";
-import { HistoryIcon, HomeIcon, LogOutIcon, SendIcon } from "lucide-react";
+import { HomeIcon, LogOutIcon, PlusCircleIcon, SendIcon } from "lucide-react";
 import { useActiveWallet, useDisconnect } from "thirdweb/react";
 import { ReactNode, useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
@@ -46,7 +46,7 @@ export function Layout() {
 	return (
 		<div className="flex flex-col min-h-screen bg-slate-50">
 			{/* Header with scroll-based styling */}
-			{account && !isMobile && (
+			{account && !isMobile && username !== null && (
 				<header
 					className={`sticky top-0 z-20 transition-all duration-300 ${
 						scrolled ? "bg-white/90 shadow-md backdrop-blur-sm border-b" : "bg-transparent"
@@ -106,10 +106,10 @@ export function Layout() {
 						isActive={activeView === "send"}
 					/>
 					<MobileNavItem
-						icon={<HistoryIcon className="h-5 w-5" />}
-						label="History"
-						onClick={() => handleNavClick("history")}
-						isActive={activeView === "history"}
+						icon={<PlusCircleIcon className="h-5 w-5" />}
+						label="Top Up"
+						onClick={() => handleNavClick("topup")}
+						isActive={activeView === "topup"}
 					/>
 					<button
 						onClick={onDisconnect}

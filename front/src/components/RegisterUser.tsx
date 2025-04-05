@@ -287,7 +287,7 @@ export const RegisterUser = () => {
 					<Button
 						onClick={handleRegister}
 						disabled={isSubmitting || isChecking || !validation.success || isAvailable !== true}
-						className="w-full h-12 font-medium text-base bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 transition-all duration-300"
+						className="w-full h-12 font-medium text-base bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 transition-all duration-300 cursor-pointer"
 					>
 						{isSubmitting ? (
 							<span className="flex items-center gap-2">
@@ -301,7 +301,7 @@ export const RegisterUser = () => {
 
 					<button
 						onClick={handleDisconnect}
-						className="text-red-500 hover:text-red-600 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors"
+						className="text-red-500 hover:text-red-600 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
 					>
 						<LogOutIcon className="h-3.5 w-3.5" />
 						Cancel and disconnect

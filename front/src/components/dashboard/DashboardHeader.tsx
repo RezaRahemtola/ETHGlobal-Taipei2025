@@ -25,21 +25,15 @@ export const DashboardHeader = ({ username, balance, setActiveView }: DashboardH
 					<Button
 						size="sm"
 						onClick={() => setActiveView("topup")}
-						className="bg-green-500 hover:bg-green-600 text-white text-xs px-3"
+						className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 cursor-pointer"
 					>
-						<PlusCircleIcon className="h-3 w-3 mr-1" /> Top Up
+						<PlusCircleIcon className="h-4 w-4 mr-1" /> Top Up
 					</Button>
 				</div>
 				<h1 className="text-5xl font-bold flex items-baseline">
 					<span className="text-2xl mr-1">$</span>
 					{balance.toFixed(2)}
 				</h1>
-				<div className="mt-4 bg-white/20 h-1 w-full rounded-full overflow-hidden">
-					<div
-						className="bg-emerald-400 h-full rounded-full"
-						style={{ width: `${Math.min(balance / 10, 100)}%` }}
-					></div>
-				</div>
 			</div>
 		</div>
 	);
